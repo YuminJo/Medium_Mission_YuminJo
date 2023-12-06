@@ -21,5 +21,37 @@
 <!-- 기본 템플릿 안에 삽입될 내용 Start -->
 <th:block layout:fragment="content"></th:block>
 <!-- 기본 템플릿 안에 삽입될 내용 End -->
+
+<script>
+    // JavaScript로 모달 열기
+    function openLoginModal() {
+        // 모달이 이미 로드되었는지 확인
+        const isModalLoaded = document.getElementById('login-popup') !== null;
+
+        if (!isModalLoaded) {
+            // 모달이 로드되지 않았다면 동적으로 HTML을 로드
+            fetch('/member/login')  // 로그인 폼 HTML의 경로를 적절히 수정
+                .then(response => response.text())
+                .then(html => {
+                    // 받아온 HTML을 body에 삽입
+                    document.body.insertAdjacentHTML('beforeend', html);
+                    // 모달 열기
+                    openModal();
+                })
+                .catch(error => console.error('Error loading login form:', error));
+        } else {
+            // 모달이 이미 로드되어 있으면 바로 열기
+            openModal();
+        }
+    }
+
+    function openModal() {
+        document.getElementById('login-popup').classList.remove('hidden');
+    }
+
+    function closeLoginModal() {
+        document.getElementById('login-popup').classList.add('hidden');
+    }
+</script>
 </body>
 </html>
