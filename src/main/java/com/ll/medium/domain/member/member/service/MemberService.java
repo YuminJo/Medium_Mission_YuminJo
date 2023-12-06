@@ -1,5 +1,7 @@
 package com.ll.medium.domain.member.member.service;
 
+import java.util.Optional;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,5 +24,9 @@ public class MemberService {
 		member.setPassword(passwordEncoder.encode(password));
 		this.memberRepository.save(member);
 		return null;
+	}
+
+	public Optional<Member> findUser(String name) {
+		return memberRepository.findByusername(name);
 	}
 }

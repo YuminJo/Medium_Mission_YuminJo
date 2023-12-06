@@ -21,6 +21,12 @@ import lombok.RequiredArgsConstructor;
 public class MemberController {
 	private final MemberService memberService;
 	@PreAuthorize("isAnonymous()")
+	@GetMapping("/login")
+	public String login() {
+		return "member/member/login_form";
+	}
+
+	@PreAuthorize("isAnonymous()")
 	@GetMapping("/join")
 	public String signup(MemberCreateForm memberCreateForm) {
 		return "member/member/join_form";
@@ -33,29 +39,25 @@ public class MemberController {
 			return "member/member/join_form";
 		}
 
-		if(!memberCreateForm.getPassword1().equals(memberCreateForm.getPassword2())) {
-			bindingResult.rejectValue("password2", "passwordInCorrect",
-				"패스워드가 일치하지 않습니다.");
+		if (!memberCreateForm.getPassword1().equals(memberCreateForm.getPassword2())) {
+			bindingResult.rejectValue("password2", "passwordInCorrect", "패스워드가 일치하지 않습니다.");
 			return "member/member/join_form";
 		}
 
-		model.addAttribute("memberCreateForm", memberCreateForm);
-
 		try {
 			memberService.create(memberCreateForm.getUsername(), memberCreateForm.getPassword1());
-		}
-		catch(DataIntegrityViolationException e) {
-			e.printStackTrace();
-			bindingResult.reject("signupFailed", "이미 등록된 사용자입니다.");
+		} catch (DataIntegrityViolationException e) {
+			handleSignupError(model, "이미 등록된 사용자입니다.");
+			return "member/member/join_form";
+		} catch (Exception e) {
+			handleSignupError(model, e.getMessage());
 			return "member/member/join_form";
 		}
 
 		return "redirect:/";
 	}
 
-	@PreAuthorize("isAnonymous()")
-	@GetMapping("/login")
-	public String login() {
-		return "member/member/login_form";
+	private void handleSignupError(Model model, String errorMessage) {
+		model.addAttribute("signupFailed", errorMessage);
 	}
 }

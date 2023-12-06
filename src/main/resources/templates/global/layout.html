@@ -22,35 +22,14 @@
 <th:block layout:fragment="content"></th:block>
 <!-- 기본 템플릿 안에 삽입될 내용 End -->
 
-<script>
-    // JavaScript로 모달 열기
-    function openLoginModal() {
-        // 모달이 이미 로드되었는지 확인
-        const isModalLoaded = document.getElementById('login-popup') !== null;
+<script th:inline="javascript">
+    // Thymeleaf에서 생성한 버튼 클릭 시 실행되는 JavaScript 함수
+    function moveToMain() {
+        // 여기에 이동할 URL을 설정
+        var loginUrl = "/";
 
-        if (!isModalLoaded) {
-            // 모달이 로드되지 않았다면 동적으로 HTML을 로드
-            fetch('/member/login')  // 로그인 폼 HTML의 경로를 적절히 수정
-                .then(response => response.text())
-                .then(html => {
-                    // 받아온 HTML을 body에 삽입
-                    document.body.insertAdjacentHTML('beforeend', html);
-                    // 모달 열기
-                    openModal();
-                })
-                .catch(error => console.error('Error loading login form:', error));
-        } else {
-            // 모달이 이미 로드되어 있으면 바로 열기
-            openModal();
-        }
-    }
-
-    function openModal() {
-        document.getElementById('login-popup').classList.remove('hidden');
-    }
-
-    function closeLoginModal() {
-        document.getElementById('login-popup').classList.add('hidden');
+        // 이동 로직
+        window.location.href = loginUrl;
     }
 </script>
 </body>
