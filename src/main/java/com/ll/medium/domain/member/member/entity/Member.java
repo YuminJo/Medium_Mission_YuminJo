@@ -21,7 +21,4 @@ public class Member {
 
 	@Column
 	private String password;
-
-	@Column(unique = true)
-	private String email;
 }
