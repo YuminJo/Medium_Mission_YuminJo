@@ -1,8 +1,39 @@
 <html layout:decorate="~{global/layout}">
-<div layout:fragment="content" class="flex items-center justify-center min-h-screen bg-white-100">
-    <div class="text-center mx-auto w-full max-w-md">
-        <h1 class="mb-3 text-center" style="font-size: 25px;">메인화면</h1>
-        <p class="mb-10">우와</p>
+<div layout:fragment="content">
+    <div class="max-w-full relative border-t border-b border-black">
+        <div class="bg-blue-800 text-white text-left p-10">
+            <p class="text-5xl font-bold mb-4">안녕하세요.</p>
+            <p class="text-2xl text-white font-bold mb-12">우와 반갑습니다.</p>
+            <button class="px-6 py-2 bg-white text-blue-800 rounded-full">아무 기능이 없는 버튼.</button>
+        </div>
     </div>
+
+    <div class="flex flex-col text-center p-5">
+        <p class="text-3xl">앗!</p>
+        <p>당신을 위해 최근 30개의 글목록을 준비했어요!</p>
+    </div>
+
+    <hr>
+    <div class="flex flex-col h-screen">
+        <main class="flex-grow p-4 space-y-4">
+            <div class="rounded-lg bg-card text-card-foreground" data-v0-t="card">
+                <div class="p-4 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold leading-tight">Stock Market Update</h3>
+                        <div class="inline-flex items-center px-2.5 py-0.5 text-xs font-bold">
+                            Finance
+                        </div>
+                    </div>
+                    <p class="text-sm">The stock market is showing signs of recovery with a 10% increase in the last week.</p>
+                </div>
+                <div class="p-4">
+                    <a class="text-sm text-blue-500" href="#" rel="ugc">
+                        해당 게시물 보러가기!
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+
 </div>
 </html>
