@@ -41,8 +41,9 @@
             </button>
             <!-- 여기에 로그인 및 회원가입 버튼 추가 -->
             <div class="flex space-x-4">
-                <a th:href="@{/member/login}" class="text-gray-900 hover:text-blue-700">로그인</a>
-                <a th:href="@{/member/join}" class="text-gray-900 hover:text-blue-700">회원가입</a>
+                    <a class="text-gray-900 hover:text-blue-700" sec:authorize="isAnonymous()" th:href="@{/member/login}">로그인</a>
+                    <a class="text-gray-900 hover:text-blue-700" sec:authorize="isAuthenticated()" th:href="@{/member/logout}">로그아웃</a>
+                    <a class="text-gray-900 hover:text-blue-700" sec:authorize="isAnonymous()" th:href="@{/member/join}">회원가입</a>
             </div>
         </div>
         <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-search">

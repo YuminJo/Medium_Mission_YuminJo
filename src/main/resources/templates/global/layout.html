@@ -21,16 +21,5 @@
 <!-- 기본 템플릿 안에 삽입될 내용 Start -->
 <th:block layout:fragment="content"></th:block>
 <!-- 기본 템플릿 안에 삽입될 내용 End -->
-
-<script th:inline="javascript">
-    // Thymeleaf에서 생성한 버튼 클릭 시 실행되는 JavaScript 함수
-    function moveToMain() {
-        // 여기에 이동할 URL을 설정
-        var loginUrl = "/";
-
-        // 이동 로직
-        window.location.href = loginUrl;
-    }
-</script>
 </body>
 </html>

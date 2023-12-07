@@ -35,6 +35,8 @@ public class MemberController {
 	@PreAuthorize("isAnonymous()")
 	@PostMapping("/join")
 	public String signup(Model model,@Valid MemberCreateForm memberCreateForm, BindingResult bindingResult) {
+		model.addAttribute("memberCreateForm", memberCreateForm);
+
 		if(bindingResult.hasErrors()) {
 			return "member/member/join_form";
 		}
