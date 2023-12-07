@@ -49,7 +49,7 @@ public class MemberController {
 		try {
 			memberService.create(memberCreateForm.getUsername(), memberCreateForm.getPassword1());
 		} catch (DataIntegrityViolationException e) {
-			handleSignupError(model, "이미 등록된 사용자입니다.");
+			bindingResult.rejectValue("username", "alreadyRegisteredUsers", "이미 등록된 사용자입니다.");
 			return "member/member/join_form";
 		} catch (Exception e) {
 			handleSignupError(model, e.getMessage());
