@@ -27,7 +27,7 @@ public class MemberService {
 		return null;
 	}
 
-	public Optional<Member> findUser(String name) {
+	public Optional<Member> findByusername(String name) {
 		return memberRepository.findByusername(name);
 	}
 }

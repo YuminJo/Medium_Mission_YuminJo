@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.ll.medium.domain.member.createform.MemberCreateForm;
 import com.ll.medium.domain.member.member.service.MemberService;
+import com.ll.medium.global.errors.UserErrorMessage;
+import com.ll.medium.global.rq.Rq;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/member")
 public class MemberController {
 	private final MemberService memberService;
+	private final Rq rq;
 	@PreAuthorize("isAnonymous()")
 	@GetMapping("/login")
 	public String login() {
@@ -38,22 +41,24 @@ public class MemberController {
 		model.addAttribute("memberCreateForm", memberCreateForm);
 
 		if(bindingResult.hasErrors()) {
-			return "domain/member/member/join_form";
+			return rq.returnToJoinForm();
 		}
 
 		if (!memberCreateForm.getPassword1().equals(memberCreateForm.getPassword2())) {
-			bindingResult.rejectValue("password2", "passwordInCorrect", "패스워드가 일치하지 않습니다.");
-			return "domain/member/member/join_form";
+			bindingResult.rejectValue("password2", UserErrorMessage.PASSWORD_INCORRECT, UserErrorMessage.PASSWORD_MISMATCH);
+			return rq.returnToJoinForm();
+		}
+
+		if(memberService.findByusername(memberCreateForm.getUsername()).isPresent()) {
+			bindingResult.rejectValue("username", UserErrorMessage.ALREADY_REGISTERED_USERS, UserErrorMessage.USER_ALREADY_REGISTERED);
+			return rq.returnToJoinForm();
 		}
 
 		try {
 			memberService.create(memberCreateForm.getUsername(), memberCreateForm.getPassword1());
-		} catch (DataIntegrityViolationException e) {
-			bindingResult.rejectValue("username", "alreadyRegisteredUsers", "이미 등록된 사용자입니다.");
-			return "domain/member/member/join_form";
 		} catch (Exception e) {
 			handleSignupError(model, e.getMessage());
-			return "domain/member/member/join_form";
+			return rq.returnToJoinForm();
 		}
 
 		return "redirect:/";
