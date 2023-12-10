@@ -1,10 +1,16 @@
 <html layout:decorate="~{global/layout}">
 <div layout:fragment="content">
-    <div class="max-w-full relative border-t border-b border-black">
-        <div class="bg-blue-800 text-white text-left p-10">
-            <p class="text-5xl font-bold mb-4">안녕하세요.</p>
-            <p class="text-2xl text-white font-bold mb-12">우와 반갑습니다.</p>
-            <button class="px-6 py-2 bg-white text-blue-800 rounded-full">아무 기능이 없는 버튼.</button>
+    <div class="bg-blue-800">
+        <div class="max-w-full border-t border-b border-black">
+            <div class="flex justify-center">
+                <div class="text-white text-left az ay al ax">
+                    <div class="py-10">
+                        <p class="text-5xl font-bold mb-4">안녕하세요.</p>
+                        <p class="text-2xl text-white font-bold mb-12">우와 반갑습니다.</p>
+                        <button class="px-6 py-2 bg-white text-blue-800 rounded-full">아무 기능이 없는 버튼.</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -14,26 +20,30 @@
     </div>
 
     <hr>
-    <div class="flex flex-col h-screen">
-        <main class="flex-grow p-4 space-y-4">
-            <div class="rounded-lg bg-card text-card-foreground" data-v0-t="card">
-                <div class="p-4 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-lg font-bold leading-tight">Stock Market Update</h3>
-                        <div class="inline-flex items-center px-2.5 py-0.5 text-xs font-bold">
-                            Finance
-                        </div>
-                    </div>
-                    <p class="text-sm">The stock market is showing signs of recovery with a 10% increase in the last week.</p>
-                </div>
-                <div class="p-4">
-                    <a class="text-sm text-blue-500" href="#" rel="ugc">
-                        해당 게시물 보러가기!
-                    </a>
-                </div>
-            </div>
-        </main>
-    </div>
+    <main class="flex justify-center">
+        <div class="bg-card az ay al ax py-3">
+            <!-- 작성자 정보 추가 -->
+            <p class="text-xs text-black-300 mb-3">작성자: [작성자명]</p>
 
+            <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-bold leading-tight">Stock Market Update</h2>
+
+                    <!-- Finance를 라운드된 태그로 만들기 -->
+                    <div class="inline-flex items-center px-2.5 py-0.5 text-s font-bold bg-blue-500 text-white rounded-full">
+                        Finance
+                    </div>
+                </div>
+
+                <p class="text-sm">The stock market is showing signs of recovery with a 10% increase in the last
+                    week.</p>
+                <!--<p th:text="${#strings.length(stockMarketUpdate) > 100 ? #strings.substring(stockMarketUpdate, 0, 100) + '...' : stockMarketUpdate}" class="text-sm"></p>-->
+            </div>
+            <div class="mt-5">
+                <!-- 해당 게시물 보러가기 대신에 작성된 날짜를 보여주기 -->
+                <p class="text-gray-500" style="font-size: 13px;">Dec 6 . 18 min read</p>
+            </div>
+        </div>
+    </main>
 </div>
 </html>

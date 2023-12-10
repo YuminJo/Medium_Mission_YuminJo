@@ -1,3 +1,19 @@
 html > body {
     font-family: 'Noto Sans KR', sans-serif;
 }
+
+.az {
+    min-width: 0;
+}
+
+.ay {
+    max-width: 1192px;
+}
+
+.al {
+    width: 100%;
+}
+
+.ax {
+    margin: 0 64px;
+}
