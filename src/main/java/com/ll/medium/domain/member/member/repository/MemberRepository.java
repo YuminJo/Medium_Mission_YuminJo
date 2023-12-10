@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.ll.medium.domain.member.member.entity.Member;
 public interface MemberRepository extends JpaRepository<Member, Long> {
-	Optional<Member> findByusername(String username);
+	Optional<Member> findByUsername(String username);
 }

@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.ll.medium.domain.member.createform.MemberCreateForm;
+import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.service.MemberService;
 import com.ll.medium.global.errors.UserErrorMessage;
 import com.ll.medium.global.rq.Rq;
+import com.ll.medium.global.rsData.RsData.RsData;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberController {
 	private final MemberService memberService;
 	private final Rq rq;
+
 	@PreAuthorize("isAnonymous()")
 	@GetMapping("/login")
 	public String login() {
@@ -37,34 +40,20 @@ public class MemberController {
 
 	@PreAuthorize("isAnonymous()")
 	@PostMapping("/join")
-	public String signup(Model model,@Valid MemberCreateForm memberCreateForm, BindingResult bindingResult) {
+	public String signup(Model model, @Valid MemberCreateForm memberCreateForm, BindingResult bindingResult) {
 		model.addAttribute("memberCreateForm", memberCreateForm);
 
 		if(bindingResult.hasErrors()) {
-			return rq.returnToJoinForm();
+			return "domain/member/member/join_form";
 		}
 
-		if (!memberCreateForm.getPassword1().equals(memberCreateForm.getPassword2())) {
-			bindingResult.rejectValue("password2", UserErrorMessage.PASSWORD_INCORRECT, UserErrorMessage.PASSWORD_MISMATCH);
-			return rq.returnToJoinForm();
+		RsData<Member> joinRs = memberService.join(memberCreateForm.getUsername(), memberCreateForm.getPassword1(),
+			memberCreateForm.getPassword2());
+
+		if (joinRs.isFail()) {
+			bindingResult.rejectValue(memberService.getUserErrorField(joinRs), joinRs.getResultCode(), joinRs.getMsg());
+			return "domain/member/member/join_form";
 		}
-
-		if(memberService.findByusername(memberCreateForm.getUsername()).isPresent()) {
-			bindingResult.rejectValue("username", UserErrorMessage.ALREADY_REGISTERED_USERS, UserErrorMessage.USER_ALREADY_REGISTERED);
-			return rq.returnToJoinForm();
-		}
-
-		try {
-			memberService.create(memberCreateForm.getUsername(), memberCreateForm.getPassword1());
-		} catch (Exception e) {
-			handleSignupError(model, e.getMessage());
-			return rq.returnToJoinForm();
-		}
-
-		return "redirect:/";
-	}
-
-	private void handleSignupError(Model model, String errorMessage) {
-		model.addAttribute("signupFailed", errorMessage);
+		return rq.redirectOrBack(joinRs, "/");
 	}
 }

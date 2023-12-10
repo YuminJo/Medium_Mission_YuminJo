@@ -1,5 +1,8 @@
 package com.ll.medium.domain.member.createform;
 
+import com.ll.medium.global.errors.UserErrorMessage;
+
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -7,12 +10,12 @@ import lombok.Data;
 @Data
 public class MemberCreateForm {
 	@Size(min = 3, max = 25)
-	@NotEmpty(message = "사용자ID는 필수항목입니다.")
+	@NotBlank(message = UserErrorMessage.NEED_USER_ID)
 	private String username;
 
-	@NotEmpty(message = "비밀번호는 필수항목입니다.")
+	@NotBlank(message = UserErrorMessage.NEED_PASSWORD)
 	String password1;
 
-	@NotEmpty(message = "비밀번호 확인은 필수항목입니다.")
+	@NotBlank(message = UserErrorMessage.NEED_PASSWORD2)
 	String password2;
 }

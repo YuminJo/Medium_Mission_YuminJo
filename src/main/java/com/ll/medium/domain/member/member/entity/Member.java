@@ -1,5 +1,7 @@
 package com.ll.medium.domain.member.member.entity;
 
+import static lombok.AccessLevel.*;
+
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.LastModifiedDate;
@@ -11,12 +13,17 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = PROTECTED)
+@AllArgsConstructor(access = PROTECTED)
+@Builder
 @Getter @Setter
 @EntityListeners(AuditingEntityListener.class)
 public class Member {

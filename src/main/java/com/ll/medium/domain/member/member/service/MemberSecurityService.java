@@ -26,7 +26,7 @@ public class MemberSecurityService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		return memberRepository.findByusername(username).map(member -> {
+		return memberRepository.findByUsername(username).map(member -> {
 			List<GrantedAuthority> authorities = new ArrayList<>();
 
 			authorities.add(new SimpleGrantedAuthority(
