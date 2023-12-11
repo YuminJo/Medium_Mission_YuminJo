@@ -17,3 +17,19 @@ html > body {
 .ax {
     margin: 0 64px;
 }
+
+textarea:focus {
+    outline: none;
+}
+button:focus {
+    outline: none;
+}
+input:focus {
+    outline: none;
+}
+
+textarea {
+    min-height: 5rem;
+    overflow-y: hidden;
+    resize: none;
+}
