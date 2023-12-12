@@ -3,6 +3,7 @@ package com.ll.medium.domain.article.article.controller;
 import java.security.Principal;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,12 +13,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.ll.medium.domain.article.article.entity.Article;
 import com.ll.medium.domain.article.article.service.ArticleService;
 import com.ll.medium.domain.article.form.ArticleForm;
 import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.service.MemberService;
+import com.ll.medium.global.errors.UserErrorMessage;
 import com.ll.medium.global.rq.Rq;
 
 import jakarta.validation.Valid;
@@ -64,7 +67,7 @@ public class ArticleController {
 		Article article = this.articleService.getArticle(id);
 
 		if (!articleService.articleIsNotPublished(article, principal)) {
-			return rq.redirect("/post/list","해당 게시물은 비공개 상태입니다.");
+			return rq.redirect("/post/list",UserErrorMessage.PRIVATE_ARTICLE);
 		}
 
 		model.addAttribute("article", article);
@@ -99,7 +102,7 @@ public class ArticleController {
 		Article article = this.articleService.getArticle(id);
 
 		if(!article.getAuthor().getUsername().equals(principal.getName())) {
-			return rq.redirect("/post/list","수정권한이 없습니다.");
+			return rq.redirect("/post/list",UserErrorMessage.USER_NO_MODIFY_PERMISSION);
 		}
 
 		articleForm.setSubject(article.getTitle());
@@ -116,11 +119,22 @@ public class ArticleController {
 		Article article = this.articleService.getArticle(id);
 
 		if(!article.getAuthor().getUsername().equals(principal.getName())) {
-			return rq.redirect("/post/list","수정권한이 없습니다.");
+			return rq.redirect("/post/list",UserErrorMessage.USER_NO_MODIFY_PERMISSION);
 		}
 
 		this.articleService.modify(article, articleForm.getSubject(), articleForm.getContent(), articleForm.getIsPublished());
 
 		return rq.redirect(String.format("/post/%s",id), "게시글 수정 완료!");
+	}
+
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/{id}/delete")
+	public String answerDelete(Principal principal, @PathVariable("id") Integer id) {
+		Article article = this.articleService.getArticle(id);
+		if(!article.getAuthor().getUsername().equals(principal.getName())) {
+			return rq.redirect("/post/list", UserErrorMessage.USER_NO_DELETE_PERMISSION);
+		}
+		this.articleService.delete(article);
+		return rq.redirect("/post/list","게시글이 삭제되었습니다.");
 	}
 }
