@@ -98,4 +98,15 @@ public class ArticleService {
 
 		return true;
 	}
+
+	public void modify(Article article, String title, String body, Boolean isPublished) {
+		if(title.length() > 50) {
+			title = title.substring(0, 47) + "...";
+		}
+
+		article.setTitle(title);
+		article.setBody(body);
+		article.setPublished(isPublished);
+		this.articleRepository.save(article);
+	}
 }

@@ -46,5 +46,4 @@ public class Article {
 	private Long voteCount;
 
 	private LocalDateTime createDate;
-	private LocalDateTime modifyDate;
 }

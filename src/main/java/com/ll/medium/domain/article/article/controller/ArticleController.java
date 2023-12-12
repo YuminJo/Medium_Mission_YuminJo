@@ -109,4 +109,18 @@ public class ArticleController {
 		model.addAttribute("articleForm", articleForm);
 		return FORM_VIEW;
 	}
+
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/{id}/modify")
+	public String articleModify(@Valid ArticleForm articleForm, @PathVariable("id") Integer id, Principal principal) {
+		Article article = this.articleService.getArticle(id);
+
+		if(!article.getAuthor().getUsername().equals(principal.getName())) {
+			return rq.redirect("/post/list","수정권한이 없습니다.");
+		}
+
+		this.articleService.modify(article, articleForm.getSubject(), articleForm.getContent(), articleForm.getIsPublished());
+
+		return rq.redirect(String.format("/post/%s",id), "게시글 수정 완료!");
+	}
 }

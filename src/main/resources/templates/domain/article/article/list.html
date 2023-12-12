@@ -48,7 +48,7 @@
                 <td class="p-4 text-center" th:text="${article.getId()}"></td>
                 <td class="p-4">
                     <a th:href="@{|/post/${article.id}|}" class="align-middle text-left font-medium">
-                        <span th:utext="${#strings.length(article.getTitle()) &lt;= 60} ? ${article.getTitle()} : ${#strings.substring(article.getTitle(), 0, 60)} + '...'"></span>
+                        <span th:utext="${#strings.length(article.getTitle()) &lt;= 30} ? ${article.getTitle()} : ${#strings.substring(article.getTitle(), 0, 30)} + '...'"></span>
                     </a>
                 </td>
                 <td class="p-4">
