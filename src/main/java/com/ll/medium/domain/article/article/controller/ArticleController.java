@@ -8,61 +8,88 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.ll.medium.domain.article.article.entity.Article;
 import com.ll.medium.domain.article.article.service.ArticleService;
-import com.ll.medium.domain.article.form.ArticleCreateForm;
+import com.ll.medium.domain.article.form.ArticleForm;
 import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.service.MemberService;
+import com.ll.medium.global.rq.Rq;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Controller
-@RequiredArgsConstructor
 @RequestMapping("/post")
+@RequiredArgsConstructor
 public class ArticleController {
 	private final ArticleService articleService;
 	private final MemberService memberService;
+	private final Rq rq;
+
+	private static final String ARTICLE_LIST_VIEW = "domain/article/article/list";
+	private static final String ARTICLE_DETAIL_VIEW = "domain/article/article/detail";
+	private static final String FORM_VIEW = "domain/article/article/form";
 
 	@GetMapping("/list")
-	public String showAllPost(Model model, @RequestParam(value = "page", defaultValue = "0") int page) {
-		Page<Article> paging = this.articleService.getList(page);
+	public String showAllPost(Model model,
+		@RequestParam(value = "page", required = false, defaultValue = "0") int page,
+		@RequestParam(value = "kw", required = false, defaultValue = "") String kw) {
+
+		Page<Article> paging = this.articleService.getList(page, kw);
 		model.addAttribute("paging", paging);
-		return "domain/article/article/list";
+		model.addAttribute("kw", kw);
+		return ARTICLE_LIST_VIEW;
 	}
 
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/myList")
-	public String showMyPost() {
-		return "domain/article/article/list";
+	public String showMyPost(Model model,
+		@RequestParam(value = "page", required = false, defaultValue = "0") int page,
+		Principal principal) {
+
+		Member member = this.memberService.getUser(principal.getName());
+		Page<Article> paging = this.articleService.getList(page, member.getUsername());
+		model.addAttribute("paging", paging);
+		model.addAttribute("myList", true);
+		return ARTICLE_LIST_VIEW;
 	}
 
 	@GetMapping("/{id}")
-	public String detail() {
-		return "article/article/list";
+	public String detail(Model model, @PathVariable("id") Integer id, ArticleForm articleForm, Principal principal) {
+		Article article = this.articleService.getArticle(id);
+
+		if (!articleService.articleIsNotPublished(article, principal)) {
+			return rq.redirect("/post/list","해당 게시물은 비공개 상태입니다.");
+		}
+
+		model.addAttribute("article", article);
+		return ARTICLE_DETAIL_VIEW;
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/write")
-	public String write(Model model, ArticleCreateForm articleCreateForm) {
-		articleCreateForm.setIsPublished(true);
+	public String write(Model model, ArticleForm articleForm) {
+		articleForm.setIsPublished(true);
 
-		model.addAttribute("articleCreateForm", articleCreateForm);
-		return "domain/article/article/form";
+		model.addAttribute("articleCreateForm", articleForm);
+		return FORM_VIEW;
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/write")
-	public String write(@Valid ArticleCreateForm articleCreateForm, BindingResult bindingResult, Principal principal) {
+	public String write(@Valid ArticleForm articleForm, BindingResult bindingResult, Principal principal) {
 		if (bindingResult.hasErrors()) {
-			return "domain/article/article/form";
+			return FORM_VIEW;
 		}
+
 		Member member = this.memberService.getUser(principal.getName());
-		this.articleService.create(articleCreateForm.getSubject(), articleCreateForm.getContent(),
-			articleCreateForm.getIsPublished(), member);
+		this.articleService.create(articleForm.getSubject(), articleForm.getContent(),
+			articleForm.getIsPublished(), member);
 		return "redirect:/post/list";
 	}
 }

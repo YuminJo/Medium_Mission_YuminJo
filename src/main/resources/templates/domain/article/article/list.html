@@ -2,16 +2,24 @@
 <div layout:fragment="content" class="container mx-auto">
 
     <!-- 게시판 상위 제목 -->
-    <div class="flex justify-center">
-        <div class="az ay al py-3">
+    <div class="flex justify-center" th:if="${myList == null}">
+        <div class="az ay al py-3 px-4">
             <h1 class="font-bold text-2xl">메인 게시판</h1>
             <h1 class="font-medium mb-4">이곳은 메인 게시판 입니다!</h1>
         </div>
     </div>
 
+    <div class="flex justify-center" th:if="${myList != null}">
+        <div class="az ay al py-3 px-4">
+            <h1 class="font-bold text-2xl">내 게시물</h1>
+            <h1 class="font-medium mb-4">이곳은 내 게시물입니다!</h1>
+        </div>
+    </div>
+
+
     <!-- 테이블 내용 -->
     <div class="flex justify-center">
-        <table class="w-full table-auto az ay al py-3"> <!-- fixed 클래스 추가 -->
+        <table class="w-full table-auto az ay al py-3">
             <thead class="border-b">
             <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted text-left">
                 <th class="h-12 px-4 align-middle font-medium text-muted-foreground w-1/10 text-center">
@@ -35,11 +43,11 @@
             </tr>
             </thead>
             <tbody th:if="${paging.stream().count() > 0}">
-            <tr th:each="article, loop : ${paging}" th:if="${article.isPublished()}"
+            <tr th:each="article, loop : ${paging}" th:if="${article.isPublished() || myList != null and myList}"
                 class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                 <td class="p-4 text-center" th:text="${article.getId()}"></td>
                 <td class="p-4">
-                    <a href="" class="align-middle text-left font-medium">
+                    <a th:href="@{|/post/${article.id}|}" class="align-middle text-left font-medium">
                         <span th:utext="${#strings.length(article.getTitle()) &lt;= 60} ? ${article.getTitle()} : ${#strings.substring(article.getTitle(), 0, 60)} + '...'"></span>
                     </a>
                 </td>
