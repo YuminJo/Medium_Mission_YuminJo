@@ -18,7 +18,6 @@ function sweetAlertWarning(msg) {
 
     Swal.fire({
         icon: 'warning',
-        title: 'Alert가 실행되었습니다.',
         text: queryParams.msg,
     });
 }

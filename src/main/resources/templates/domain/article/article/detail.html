@@ -10,8 +10,8 @@
             <div class="mt-3 text-gray-400">
                 <i class="fa-regular fa-user" style="width: 16px"></i>
                 <span class="ml-1" th:text="${'By ' + article.getAuthor().username}"></span>
-                <div>
-                    <i class="fa-regular fa-pen-to-square"></i><a th:href="@{/}" class="ml-2">Edit</a>
+                <div th:if="${article.author != null and #authentication.getPrincipal().getUsername() == article.author.username}">
+                    <i class="fa-regular fa-pen-to-square"></i><a th:href="@{|/post/${article.id}/modify|}" class="ml-2">Edit</a>
                     <i class="fa-regular fa-pen-to-square ml-4"></i><a th:href="@{/}" class="ml-2">Delete</a>
                 </div>
             </div>

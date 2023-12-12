@@ -44,6 +44,10 @@ public class ArticleService {
 	}
 
 	public RsData<Article> create(String title, String body, boolean isPublished, Member member) {
+		if(title.length() > 50) {
+			title = title.substring(0, 47) + "...";
+		}
+
 		Article article = Article.builder()
 			.title(title)
 			.body(body)

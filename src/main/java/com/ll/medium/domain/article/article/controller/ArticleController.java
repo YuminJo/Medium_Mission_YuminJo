@@ -76,7 +76,7 @@ public class ArticleController {
 	public String write(Model model, ArticleForm articleForm) {
 		articleForm.setIsPublished(true);
 
-		model.addAttribute("articleCreateForm", articleForm);
+		model.addAttribute("articleForm", articleForm);
 		return FORM_VIEW;
 	}
 
@@ -91,5 +91,22 @@ public class ArticleController {
 		this.articleService.create(articleForm.getSubject(), articleForm.getContent(),
 			articleForm.getIsPublished(), member);
 		return "redirect:/post/list";
+	}
+
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/{id}/modify")
+	public String articleModify(Model model,ArticleForm articleForm, @PathVariable("id") Integer id, Principal principal) {
+		Article article = this.articleService.getArticle(id);
+
+		if(!article.getAuthor().getUsername().equals(principal.getName())) {
+			return rq.redirect("/post/list","수정권한이 없습니다.");
+		}
+
+		articleForm.setSubject(article.getTitle());
+		articleForm.setContent(article.getBody());
+		articleForm.setIsPublished(article.isPublished());
+
+		model.addAttribute("articleForm", articleForm);
+		return FORM_VIEW;
 	}
 }
