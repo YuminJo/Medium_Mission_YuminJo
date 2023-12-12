@@ -1,9 +1,8 @@
-package com.ll.medium.domain.member.createform;
+package com.ll.medium.domain.member.form;
 
 import com.ll.medium.global.errors.UserErrorMessage;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 

@@ -19,15 +19,25 @@
         <p>당신을 위해 최근 30개의 글목록을 준비했어요!</p>
     </div>
 
+    <!-- 아무 글도 없음! -->
+    <div class="flex justify-center" th:if="${recentArticle.stream().count() <= 0}">
+        <div class="az ay al ax py-3 text-center">
+            <p class="text-black font-bold text-4xl p-2">어라..? &#x1FAE0</p>
+            <p>아직 아무 글도 없어요..!</p>
+            <p>글을 작성해서 첫 번째 게시물의 주인공이 되어보세요!</p>
+        </div>
+    </div>
+
+    <!-- 글 있음 -->
     <hr>
-    <main class="flex justify-center">
+    <div class="flex justify-center" th:if="${recentArticle.stream().count() > 0}" th:each="article, loop : ${recentArticle}">
         <div class="bg-card az ay al ax py-3">
             <!-- 작성자 정보 추가 -->
-            <p class="text-xs text-black-300 mb-3">작성자: [작성자명]</p>
+            <p class="text-xs text-black-300 mb-3" th:text="${article.author.username}"></p>
 
             <div class="space-y-2">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-bold leading-tight">Stock Market Update</h2>
+                    <h2 class="text-lg font-bold leading-tight" th:utext="${#strings.length(article.getTitle()) &lt;= 60} ? ${article.getTitle()} : ${#strings.substring(article.getTitle(), 0, 60)} + '...'"></h2>
 
                     <!-- Finance를 라운드된 태그로 만들기 -->
                     <div class="inline-flex items-center px-2.5 py-0.5 text-s font-bold bg-blue-500 text-white rounded-full">
@@ -35,15 +45,15 @@
                     </div>
                 </div>
 
-                <p class="text-sm">The stock market is showing signs of recovery with a 10% increase in the last
-                    week.</p>
+                <p class="text-sm" th:utext="${#strings.length(article.getBody()) &lt;= 60} ? ${article.getBody()} : ${#strings.substring(article.getBody(), 0, 60)} + '...'"></p>
                 <!--<p th:text="${#strings.length(stockMarketUpdate) > 100 ? #strings.substring(stockMarketUpdate, 0, 100) + '...' : stockMarketUpdate}" class="text-sm"></p>-->
             </div>
             <div class="mt-5">
                 <!-- 해당 게시물 보러가기 대신에 작성된 날짜를 보여주기 -->
-                <p class="text-gray-500" style="font-size: 13px;">Dec 6 . 18 min read</p>
+                <p class="text-gray-500" style="font-size: 13px;" th:text="${'Posted in ' + #temporals.format(article.createDate, 'MMMM d')}"></p>
             </div>
         </div>
-    </main>
+        <hr>
+    </div>
 </div>
 </html>

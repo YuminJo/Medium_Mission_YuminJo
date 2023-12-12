@@ -58,4 +58,13 @@ public class MemberService {
 		}
 		return resultField;
 	}
+
+	public Member getUser(String name) {
+		Optional<Member> member = this.memberRepository.findByUsername(name);
+		if (member.isPresent()) {
+			return member.get();
+		} else {
+			throw new RuntimeException("user not found");
+		}
+	}
 }

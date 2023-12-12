@@ -33,3 +33,12 @@ textarea {
     overflow-y: hidden;
     resize: none;
 }
+
+/*ARTICLE LIST*/
+table tr:hover {
+    background-color: #f5f5f5; /* 마우스를 올렸을 때 적용될 배경 색상 */
+}
+
+table tr:hover td {
+    color: #333; /* 마우스를 올렸을 때 적용될 글자 색상 */
+}

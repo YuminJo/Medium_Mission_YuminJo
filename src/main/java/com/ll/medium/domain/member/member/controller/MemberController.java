@@ -1,6 +1,5 @@
 package com.ll.medium.domain.member.member.controller;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,10 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.ll.medium.domain.member.createform.MemberCreateForm;
+import com.ll.medium.domain.member.form.MemberCreateForm;
 import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.service.MemberService;
-import com.ll.medium.global.errors.UserErrorMessage;
 import com.ll.medium.global.rq.Rq;
 import com.ll.medium.global.rsData.RsData.RsData;
 

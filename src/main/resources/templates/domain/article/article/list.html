@@ -1,7 +1,7 @@
-<html layout:decorate="~{global/layout}">
-<div layout:fragment="content">
+<html lang="ko" layout:decorate="~{global/layout}">
+<div layout:fragment="content" class="container mx-auto">
 
-    <!--게시판 상위 제목-->
+    <!-- 게시판 상위 제목 -->
     <div class="flex justify-center">
         <div class="az ay al py-3">
             <h1 class="font-bold text-2xl">메인 게시판</h1>
@@ -9,46 +9,57 @@
         </div>
     </div>
 
-    <div>
-        <!--테이블 내용-->
-        <div class="flex justify-center">
-            <table class="az ay al py-3">
-                <thead class="[&amp;_tr]:border-b">
-                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                    <th class="h-12 px-4 align-middle text-left font-medium text-muted-foreground">
-                        번호
-                    </th>
-                    <th class="h-12 px-4 align-middle text-left font-medium text-muted-foreground">
-                        제목
-                    </th>
-                    <th class="h-12 px-4 align-middle text-left font-medium text-muted-foreground">
-                        작성자
-                    </th>
-                    <th class="h-12 px-4 align-middle text-left font-medium text-muted-foreground">
-                        작성일
-                    </th>
-                    <th class="h-12 px-4 align-middle text-left font-medium text-muted-foreground">
-                        조회수
-                    </th>
-                    <th class="h-12 px-4 align-middle text-left font-medium text-muted-foreground">
-                        추천
-                    </th>
-                </tr>
-                </thead>
-                <tbody th:if="${paging.stream().count() > 0}">
-                <tr th:each="article, loop : ${paging}"
-                    class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                    <td class="p-4 align-middle text-left font-medium">000</td>
-                    <td class="p-4 align-middle" th:text="${article.title}"></td>
-                    <td class="p-4 align-middle" th:text="${article.author}"></td>
-                </tr>
-                </tbody>
-            </table>
-            <!--페이징처리 부분-->
-        </div>
+    <!-- 테이블 내용 -->
+    <div class="flex justify-center">
+        <table class="w-full table-auto az ay al py-3"> <!-- fixed 클래스 추가 -->
+            <thead class="border-b">
+            <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted text-left">
+                <th class="h-12 px-4 align-middle font-medium text-muted-foreground w-1/10 text-center">
+                    번호
+                </th>
+                <th class="h-12 px-4 align-middle font-medium text-muted-foreground w-3/10">
+                    제목
+                </th>
+                <th class="h-12 px-4 align-middle font-medium text-muted-foreground w-2/10">
+                    작성자
+                </th>
+                <th class="h-12 px-4 align-middle font-medium text-muted-foreground w-2/10">
+                    작성일
+                </th>
+                <th class="h-12 px-4 align-middle font-medium text-muted-foreground w-1/10 text-center">
+                    조회수
+                </th>
+                <th class="h-12 px-4 align-middle font-medium text-muted-foreground w-1/10 text-center">
+                    추천
+                </th>
+            </tr>
+            </thead>
+            <tbody th:if="${paging.stream().count() > 0}">
+            <tr th:each="article, loop : ${paging}" th:if="${article.isPublished()}"
+                class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                <td class="p-4 text-center" th:text="${article.getId()}"></td>
+                <td class="p-4">
+                    <a href="" class="align-middle text-left font-medium">
+                        <span th:utext="${#strings.length(article.getTitle()) &lt;= 60} ? ${article.getTitle()} : ${#strings.substring(article.getTitle(), 0, 60)} + '...'"></span>
+                    </a>
+                </td>
+                <td class="p-4">
+                    <a class="align-middle text-left font-medium">
+                        <span th:utext="${#strings.length(article.author.username) &lt;= 10} ? ${article.author.username} : ${#strings.substring(article.author.username, 0, 10)} + '...'"></span>
+                    </a>
+                </td>
+                <td class="p-4" th:text="${#temporals.format(article.createDate, 'yy.MM.dd HH:mm')}">
+                </td>
+                <td class="p-4 text-center" th:text="0"></td>
+                <td class="p-4 text-center" th:text="0"></td>
+            </tr>
+            </tbody>
+
+        </table>
+        <!-- 페이징 처리 부분 -->
     </div>
 
-    <!--아무글도 없음!-->
+    <!-- 아무 글도 없음! -->
     <div class="flex justify-center" th:if="${paging.stream().count() <= 0}">
         <div class="az ay al ax py-3 text-center">
             <p class="text-black font-bold text-4xl p-2">어라..? &#x1FAE0</p>

@@ -38,9 +38,6 @@ public class Member {
 	@Column
 	private String password;
 
-	@LastModifiedDate
-	private LocalDateTime modifyDate;
-
 	public Member(String username, String password) {
 		this.username = username;
 		this.password = password;
