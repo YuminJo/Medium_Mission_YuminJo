@@ -1,6 +1,5 @@
 <html layout:decorate="~{global/layout}">
 <div layout:fragment="content">
-
     <div class="flex justify-center p-6" th:object="${article}">
         <article class="text-dark-200 az ay al ax py-3">
             <h1 th:text="${article.getTitle()}"
@@ -10,9 +9,11 @@
             <div class="mt-3 text-gray-400">
                 <i class="fa-regular fa-user" style="width: 16px"></i>
                 <span class="ml-1" th:text="${'By ' + article.getAuthor().username}"></span>
-                <div th:if="${article.author != null and #authentication.getPrincipal().getUsername() == article.author.username}">
-                    <i class="fa-regular fa-pen-to-square"></i><a th:href="@{|/post/${article.id}/modify|}" class="ml-2">Edit</a>
-                    <i class="fa-regular fa-pen-to-square ml-4"></i><a th:href="@{|/post/${article.id}/delete|}" class="ml-2">Delete</a>
+                <div sec:authorize="isAuthenticated()" th:if="${article.author != null and #authentication.getPrincipal().getUsername() == article.author.username}">
+                    <i class="fa-regular fa-pen-to-square"></i><a th:href="@{|/post/${article.id}/modify|}"
+                                                                  class="ml-2">Edit</a>
+                    <i class="fa-regular fa-pen-to-square ml-4"></i><a th:href="@{|/post/${article.id}/delete|}"
+                                                                       class="ml-2">Delete</a>
                 </div>
             </div>
             <p class="text-gray-500"
