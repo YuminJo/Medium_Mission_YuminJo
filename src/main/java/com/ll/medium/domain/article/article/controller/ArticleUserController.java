@@ -40,6 +40,7 @@ public class ArticleUserController {
 		Page<Article> paging = articleService.getList(page, member.getUsername(), true);
 		model.addAttribute("paging", paging);
 		model.addAttribute("listusername", member.getUsername());
+		model.addAttribute("customPath","/b/"+userid);
 		return "domain/article/article/list";
 	}
 

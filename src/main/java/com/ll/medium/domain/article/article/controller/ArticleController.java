@@ -46,6 +46,7 @@ public class ArticleController {
 		Page<Article> paging = articleService.getList(page, kw, true);
 		model.addAttribute("paging", paging);
 		model.addAttribute("kw", kw);
+		model.addAttribute("customPath","/post/list");
 		return ARTICLE_LIST_VIEW;
 	}
 
@@ -53,11 +54,14 @@ public class ArticleController {
 	@GetMapping("/myList")
 	public String showMyPost(Model model,
 		@RequestParam(value = "page", required = false, defaultValue = "0") int page,
+		@RequestParam(value = "kw", required = false, defaultValue = "") String kw,
 		Principal principal) {
 		Member member = memberService.getUser(principal.getName());
 		Page<Article> paging = articleService.getList(page, member.getUsername(), false);
 		model.addAttribute("paging", paging);
+		model.addAttribute("kw", kw);
 		model.addAttribute("listusername", member.getUsername());
+		model.addAttribute("customPath","/post/myList");
 		return ARTICLE_LIST_VIEW;
 	}
 	@GetMapping("/{id}")

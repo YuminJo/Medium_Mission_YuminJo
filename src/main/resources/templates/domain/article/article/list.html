@@ -98,7 +98,7 @@
             </ul>
         </div>
     </div>
-    <form th:action="@{/post/list}" method="get" id="searchForm">
+    <form th:action="@{${customPath}}" method="get" id="searchForm">
         <input type="hidden" id="kw" name="kw" th:value="${kw}">
         <input type="hidden" id="page" name="page" th:value="${paging.number}">
     </form>
