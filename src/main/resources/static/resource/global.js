@@ -1,7 +1,3 @@
-function parseMsg(msg) {
-    return msg.split(";ttl=");
-}
-
 function getQueryParams() {
     const params = new URLSearchParams(window.location.search);
     const paramsObj = {};

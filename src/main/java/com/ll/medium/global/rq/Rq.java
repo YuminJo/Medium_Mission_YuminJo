@@ -37,7 +37,8 @@ public class Rq {
 	}
 
 	public String historyBack(String msg) {
-		request.setAttribute("failMsg", msg);
+		response.setStatus(400);
+		request.setAttribute("msg", msg);
 
 		return "global/js";
 	}

@@ -94,7 +94,8 @@ public class ArticleService {
 	public boolean articleIsNotPublished(Article article, Principal principal) {
 		if (!article.isPublished()) {
 			Member author = article.getAuthor();
-			return principal == null || !author.getUsername().equals(principal.getName());
+			if(principal == null || !author.getUsername().equals(principal.getName()))
+				return false;
 		}
 
 		return true;

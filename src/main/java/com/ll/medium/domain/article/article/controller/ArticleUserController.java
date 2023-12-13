@@ -1,5 +1,7 @@
 package com.ll.medium.domain.article.article.controller;
 
+import java.security.Principal;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,8 +15,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.ll.medium.domain.article.article.entity.Article;
 import com.ll.medium.domain.article.article.service.ArticleService;
+import com.ll.medium.domain.article.form.ArticleForm;
 import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.service.MemberService;
+import com.ll.medium.global.errors.UserErrorMessage;
 import com.ll.medium.global.rq.Rq;
 
 import lombok.RequiredArgsConstructor;
@@ -27,19 +31,34 @@ public class ArticleUserController {
 	private final MemberService memberService;
 	private final Rq rq;
 
-	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/{userid}")
 	public String showUserPost(Model model,@PathVariable("userid") String userid,
 		@RequestParam(value = "page", required = false, defaultValue = "0") int page) {
 
 		Member member = this.memberService.getUser(userid);
 
-		if(member == null) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다.");
-		}
-		Page<Article> paging = this.articleService.getList(page, member.getUsername(), false);
+		Page<Article> paging = articleService.getList(page, member.getUsername(), true);
 		model.addAttribute("paging", paging);
-		model.addAttribute("myList", true);
-		return "domain/article/article/form";
+		model.addAttribute("listusername", member.getUsername());
+		return "domain/article/article/list";
+	}
+
+	@GetMapping("/{userid}/{id}")
+	public String showUserPostDetail(Model model, Principal principal, ArticleForm articleForm,
+		@PathVariable("userid") String userid,
+		@PathVariable("id") Integer id) {
+
+		Article article = this.articleService.getArticle(id);
+
+		if (article == null || !article.getAuthor().getUsername().equals(userid)) {
+			return rq.historyBack(UserErrorMessage.NO_ARTICLE);
+		}
+
+		if (!articleService.articleIsNotPublished(article, principal)) {
+			return rq.historyBack(UserErrorMessage.PRIVATE_ARTICLE);
+		}
+
+		model.addAttribute("article", article);
+		return "domain/article/article/detail";
 	}
 }

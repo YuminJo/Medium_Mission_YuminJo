@@ -57,7 +57,7 @@ public class ArticleController {
 		Member member = memberService.getUser(principal.getName());
 		Page<Article> paging = articleService.getList(page, member.getUsername(), false);
 		model.addAttribute("paging", paging);
-		model.addAttribute("myList", true);
+		model.addAttribute("listusername", member.getUsername());
 		return ARTICLE_LIST_VIEW;
 	}
 	@GetMapping("/{id}")
@@ -65,11 +65,11 @@ public class ArticleController {
 		Article article = articleService.getArticle(id);
 
 		if (article == null) {
-			return rq.redirect(REDIRECT_POST_LIST, UserErrorMessage.NO_ARTICLE);
+			return rq.historyBack(UserErrorMessage.NO_ARTICLE);
 		}
 
 		if (!articleService.articleIsNotPublished(article, principal)) {
-			return rq.redirect(REDIRECT_POST_LIST, UserErrorMessage.PRIVATE_ARTICLE);
+			return rq.historyBack(UserErrorMessage.PRIVATE_ARTICLE);
 		}
 
 		model.addAttribute("article", article);
@@ -105,7 +105,7 @@ public class ArticleController {
 		Article article = this.articleService.getArticle(id);
 
 		if (!article.getAuthor().getUsername().equals(principal.getName())) {
-			return rq.redirect("/post/list", UserErrorMessage.USER_NO_MODIFY_PERMISSION);
+			return rq.redirect(String.format("/post/%s", id), UserErrorMessage.USER_NO_MODIFY_PERMISSION);
 		}
 
 		articleForm.setSubject(article.getTitle());
@@ -122,7 +122,7 @@ public class ArticleController {
 		Article article = this.articleService.getArticle(id);
 
 		if (!article.getAuthor().getUsername().equals(principal.getName())) {
-			return rq.redirect("/post/list", UserErrorMessage.USER_NO_MODIFY_PERMISSION);
+			return rq.redirect(String.format("/post/%s", id), UserErrorMessage.USER_NO_MODIFY_PERMISSION);
 		}
 
 		this.articleService.modify(article, articleForm.getSubject(), articleForm.getContent(),
@@ -136,7 +136,7 @@ public class ArticleController {
 	public String answerDelete(Principal principal, @PathVariable("id") Integer id) {
 		Article article = this.articleService.getArticle(id);
 		if (!article.getAuthor().getUsername().equals(principal.getName())) {
-			return rq.redirect("/post/list", UserErrorMessage.USER_NO_DELETE_PERMISSION);
+			return rq.redirect(String.format("/post/%s", id), UserErrorMessage.USER_NO_DELETE_PERMISSION);
 		}
 		this.articleService.delete(article);
 		return rq.redirect("/post/list", "게시글이 삭제되었습니다.");
