@@ -37,13 +37,13 @@ public class ArticleController {
 	private static final String ARTICLE_LIST_VIEW = "domain/article/article/list";
 	private static final String ARTICLE_DETAIL_VIEW = "domain/article/article/detail";
 	private static final String FORM_VIEW = "domain/article/article/form";
+	private static final String REDIRECT_POST_LIST = "redirect:/post/list";
 
 	@GetMapping("/list")
 	public String showAllPost(Model model,
 		@RequestParam(value = "page", required = false, defaultValue = "0") int page,
 		@RequestParam(value = "kw", required = false, defaultValue = "") String kw) {
-
-		Page<Article> paging = this.articleService.getList(page, kw, true);
+		Page<Article> paging = articleService.getList(page, kw, true);
 		model.addAttribute("paging", paging);
 		model.addAttribute("kw", kw);
 		return ARTICLE_LIST_VIEW;
@@ -54,20 +54,22 @@ public class ArticleController {
 	public String showMyPost(Model model,
 		@RequestParam(value = "page", required = false, defaultValue = "0") int page,
 		Principal principal) {
-
-		Member member = this.memberService.getUser(principal.getName());
-		Page<Article> paging = this.articleService.getList(page, member.getUsername(), false);
+		Member member = memberService.getUser(principal.getName());
+		Page<Article> paging = articleService.getList(page, member.getUsername(), false);
 		model.addAttribute("paging", paging);
 		model.addAttribute("myList", true);
 		return ARTICLE_LIST_VIEW;
 	}
-
 	@GetMapping("/{id}")
 	public String detail(Model model, @PathVariable("id") Integer id, ArticleForm articleForm, Principal principal) {
-		Article article = this.articleService.getArticle(id);
+		Article article = articleService.getArticle(id);
+
+		if (article == null) {
+			return rq.redirect(REDIRECT_POST_LIST, UserErrorMessage.NO_ARTICLE);
+		}
 
 		if (!articleService.articleIsNotPublished(article, principal)) {
-			return rq.redirect("/post/list",UserErrorMessage.PRIVATE_ARTICLE);
+			return rq.redirect(REDIRECT_POST_LIST, UserErrorMessage.PRIVATE_ARTICLE);
 		}
 
 		model.addAttribute("article", article);
@@ -91,18 +93,19 @@ public class ArticleController {
 		}
 
 		Member member = this.memberService.getUser(principal.getName());
-		this.articleService.create(articleForm.getSubject(), articleForm.getContent(),
-			articleForm.getIsPublished(), member);
+		this.articleService.create(articleForm.getSubject(), articleForm.getContent(), articleForm.getIsPublished(),
+			member);
 		return "redirect:/post/list";
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/{id}/modify")
-	public String articleModify(Model model,ArticleForm articleForm, @PathVariable("id") Integer id, Principal principal) {
+	public String articleModify(Model model, ArticleForm articleForm, @PathVariable("id") Integer id,
+		Principal principal) {
 		Article article = this.articleService.getArticle(id);
 
-		if(!article.getAuthor().getUsername().equals(principal.getName())) {
-			return rq.redirect("/post/list",UserErrorMessage.USER_NO_MODIFY_PERMISSION);
+		if (!article.getAuthor().getUsername().equals(principal.getName())) {
+			return rq.redirect("/post/list", UserErrorMessage.USER_NO_MODIFY_PERMISSION);
 		}
 
 		articleForm.setSubject(article.getTitle());
@@ -118,23 +121,24 @@ public class ArticleController {
 	public String articleModify(@Valid ArticleForm articleForm, @PathVariable("id") Integer id, Principal principal) {
 		Article article = this.articleService.getArticle(id);
 
-		if(!article.getAuthor().getUsername().equals(principal.getName())) {
-			return rq.redirect("/post/list",UserErrorMessage.USER_NO_MODIFY_PERMISSION);
+		if (!article.getAuthor().getUsername().equals(principal.getName())) {
+			return rq.redirect("/post/list", UserErrorMessage.USER_NO_MODIFY_PERMISSION);
 		}
 
-		this.articleService.modify(article, articleForm.getSubject(), articleForm.getContent(), articleForm.getIsPublished());
+		this.articleService.modify(article, articleForm.getSubject(), articleForm.getContent(),
+			articleForm.getIsPublished());
 
-		return rq.redirect(String.format("/post/%s",id), "게시글 수정 완료!");
+		return rq.redirect(String.format("/post/%s", id), "게시글 수정 완료!");
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/{id}/delete")
 	public String answerDelete(Principal principal, @PathVariable("id") Integer id) {
 		Article article = this.articleService.getArticle(id);
-		if(!article.getAuthor().getUsername().equals(principal.getName())) {
+		if (!article.getAuthor().getUsername().equals(principal.getName())) {
 			return rq.redirect("/post/list", UserErrorMessage.USER_NO_DELETE_PERMISSION);
 		}
 		this.articleService.delete(article);
-		return rq.redirect("/post/list","게시글이 삭제되었습니다.");
+		return rq.redirect("/post/list", "게시글이 삭제되었습니다.");
 	}
 }

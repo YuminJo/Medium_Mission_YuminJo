@@ -52,10 +52,12 @@ public class ArticleService {
 		};
 	}
 
+	private String limitTitleLength(String title) {
+		return title.length() > 50 ? title.substring(0, 47) + "..." : title;
+	}
+
 	public RsData<Article> create(String title, String body, boolean isPublished, Member member) {
-		if(title.length() > 50) {
-			title = title.substring(0, 47) + "...";
-		}
+		title = limitTitleLength(title);
 
 		Article article = Article.builder()
 			.title(title)
@@ -64,8 +66,8 @@ public class ArticleService {
 			.isPublished(isPublished)
 			.createDate(LocalDateTime.now())
 			.build();
-		this.articleRepository.save(article);
 
+		articleRepository.save(article);
 		return RsData.of("200", "게시글 작성 완료.");
 	}
 
@@ -73,52 +75,41 @@ public class ArticleService {
 		Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Order.desc("createDate")));
 		Specification<Article> spec = search(kw, isPublished);
 
-		return this.articleRepository.findAll(spec, pageable);
+		return articleRepository.findAll(spec, pageable);
 	}
 
 	public List<Article> getRecentArticle() {
 		Pageable pageable = PageRequest.of(0, 30, Sort.by(Sort.Order.desc("createDate")));
-		Page<Article> recentArticlesPage = this.articleRepository.findAll(pageable);
+		List<Article> recentArticles = articleRepository.findAll(pageable).getContent();
 
-		return recentArticlesPage.getContent()
-			.stream()
+		return recentArticles.stream()
 			.filter(Article::isPublished)
 			.toList();
 	}
 
 	public Article getArticle(Integer id) {
-		Optional<Article> article = this.articleRepository.findById(id);
-
-		if (article.isPresent()) {
-			return article.get();
-		} else {
-			throw new RuntimeException("게시글을 찾을 수 없습니다.");
-		}
+		return articleRepository.findById(id).orElse(null);
 	}
 
 	public boolean articleIsNotPublished(Article article, Principal principal) {
 		if (!article.isPublished()) {
-			Member member = article.getAuthor();
-			if (principal == null || !member.getUsername().equals(principal.getName())) {
-				return false;
-			}
+			Member author = article.getAuthor();
+			return principal == null || !author.getUsername().equals(principal.getName());
 		}
 
 		return true;
 	}
 
 	public void modify(Article article, String title, String body, Boolean isPublished) {
-		if(title.length() > 50) {
-			title = title.substring(0, 47) + "...";
-		}
+		title = limitTitleLength(title);
 
 		article.setTitle(title);
 		article.setBody(body);
 		article.setPublished(isPublished);
-		this.articleRepository.save(article);
+		articleRepository.save(article);
 	}
 
 	public void delete(Article article) {
-		this.articleRepository.delete(article);
+		articleRepository.delete(article);
 	}
 }
