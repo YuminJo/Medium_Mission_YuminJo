@@ -72,11 +72,19 @@ public class ArticleService {
 	}
 
 	public Page<Article> getList(int page, String kw, boolean isPublished) {
-		Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Order.desc("createDate")));
+		int pageSize = 10;
+		Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Order.desc("createDate")));
 		Specification<Article> spec = search(kw, isPublished);
 
-		return articleRepository.findAll(spec, pageable);
+		Page<Article> resultPage = articleRepository.findAll(spec, pageable);
+
+		if (page > resultPage.getTotalPages()-1) {
+			throw new IllegalArgumentException("Requested page number exceeds available pages.");
+		}
+
+		return resultPage;
 	}
+
 
 	public List<Article> getRecentArticle() {
 		Pageable pageable = PageRequest.of(0, 30, Sort.by(Sort.Order.desc("createDate")));
