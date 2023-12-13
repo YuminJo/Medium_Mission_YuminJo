@@ -72,10 +72,10 @@ public class ArticleService {
 		return RsData.of("200", "게시글 작성 완료.");
 	}
 
-	public Page<Article> getList(int page, String kw, boolean isPublished) {
+	public Page<Article> getList(int page, String kw, boolean showOnlyPublished) {
 		int pageSize = 10;
 		Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Order.desc("createDate")));
-		Specification<Article> spec = search(kw, isPublished);
+		Specification<Article> spec = search(kw, showOnlyPublished);
 
 		Page<Article> resultPage = articleRepository.findAll(spec, pageable);
 

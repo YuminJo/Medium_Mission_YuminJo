@@ -32,14 +32,8 @@ public class ArticleUserController extends ArticleBaseController {
 	@GetMapping("/{userid}")
 	public String showUserPost(Model model,@PathVariable("userid") String userid,
 		@RequestParam(value = "page", required = false, defaultValue = "0") int page) {
-
-		Member member = this.memberService.getUser(userid);
-
-		Page<Article> paging = articleService.getList(page, member.getUsername(), true);
-		model.addAttribute("paging", paging);
-		model.addAttribute("listusername", member.getUsername());
-		model.addAttribute("customPath","/b/"+userid);
-		return "domain/article/article/list";
+		Member member = memberService.getUser(userid);
+		return showUserList(model, page, member.getUsername(), member.getUsername(), "b"+userid, true);
 	}
 
 	@GetMapping("/{userid}/{id}")
@@ -63,6 +57,8 @@ public class ArticleUserController extends ArticleBaseController {
 
 	@PostMapping("/{id}/increaseHit")
 	public String increaseHit(@PathVariable("id") Integer id, Principal principal) {
-		return increaseHitAndRedirect(id, "/b/{userid}/{id}", principal);
+		Article article = this.articleService.getArticle(id).getData();
+		String path = String.format("/b/%s/%s", article.getAuthor().getUsername(),id);
+		return increaseHitAndRedirect(article, path, principal);
 	}
 }

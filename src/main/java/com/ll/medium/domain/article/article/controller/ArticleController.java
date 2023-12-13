@@ -47,9 +47,7 @@ public class ArticleController extends ArticleBaseController {
 	public String showAllPost(Model model,
 		@RequestParam(value = "page", required = false, defaultValue = "0") int page,
 		@RequestParam(value = "kw", required = false, defaultValue = "") String kw) {
-		getArticleList(model, page, kw, true);
-		model.addAttribute("customPath", CUSTOM_PATH_ALL_POSTS);
-		return ARTICLE_LIST_VIEW;
+		return showUserList(model, page, null, "", CUSTOM_PATH_ALL_POSTS, true);
 	}
 
 	@PreAuthorize("isAuthenticated()")
@@ -59,10 +57,7 @@ public class ArticleController extends ArticleBaseController {
 		@RequestParam(value = "kw", required = false, defaultValue = "") String kw,
 		Principal principal) {
 		Member member = memberService.getUser(principal.getName());
-		getArticleList(model, page, member.getUsername(), false);
-		model.addAttribute("listusername", member.getUsername());
-		model.addAttribute("customPath", CUSTOM_PATH_MY_POSTS);
-		return ARTICLE_LIST_VIEW;
+		return showUserList(model, page, member.getUsername(), member.getUsername(), CUSTOM_PATH_MY_POSTS, false);
 	}
 
 	@GetMapping("/{id}")
@@ -140,6 +135,8 @@ public class ArticleController extends ArticleBaseController {
 
 	@PostMapping("/{id}/increaseHit")
 	public String increaseHit(@PathVariable("id") Integer id, Principal principal) {
-		return increaseHitAndRedirect(id, "/post/{id}", principal);
+		Article article = this.articleService.getArticle(id).getData();
+		String path = String.format("/post/%s", id);
+		return increaseHitAndRedirect(article, path, principal);
 	}
 }
