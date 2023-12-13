@@ -32,13 +32,22 @@ import lombok.RequiredArgsConstructor;
 public class ArticleService {
 	private final ArticleRepository articleRepository;
 
-	private Specification<Article> search(String kw) {
+	private Specification<Article> search(String kw, boolean isPublished) {
 		return new Specification<>() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public Predicate toPredicate(Root<Article> q, CriteriaQuery<?> query, CriteriaBuilder cb) {
-				query.distinct(true);
 				Join<Article, Member> u1 = q.join("author", JoinType.LEFT);
-				return cb.or(cb.like(u1.get("username"), "%" + kw + "%"));
+
+				Predicate keywordPredicate = cb.like(u1.get("username"), "%" + kw + "%");
+
+				if (isPublished) {
+					Predicate isPublishedPredicate = cb.isTrue(q.get("isPublished"));
+					return cb.and(keywordPredicate, isPublishedPredicate);
+				} else {
+					return keywordPredicate;
+				}
 			}
 		};
 	}
@@ -60,11 +69,10 @@ public class ArticleService {
 		return RsData.of("200", "게시글 작성 완료.");
 	}
 
-	public Page<Article> getList(int page, String kw) {
-		List<Sort.Order> sorts = new ArrayList<>();
-		sorts.add(Sort.Order.desc("createDate"));
-		Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
-		Specification<Article> spec = search(kw);
+	public Page<Article> getList(int page, String kw, boolean isPublished) {
+		Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Order.desc("createDate")));
+		Specification<Article> spec = search(kw, isPublished);
+
 		return this.articleRepository.findAll(spec, pageable);
 	}
 

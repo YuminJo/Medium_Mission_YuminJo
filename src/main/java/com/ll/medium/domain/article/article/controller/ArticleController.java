@@ -43,7 +43,7 @@ public class ArticleController {
 		@RequestParam(value = "page", required = false, defaultValue = "0") int page,
 		@RequestParam(value = "kw", required = false, defaultValue = "") String kw) {
 
-		Page<Article> paging = this.articleService.getList(page, kw);
+		Page<Article> paging = this.articleService.getList(page, kw, true);
 		model.addAttribute("paging", paging);
 		model.addAttribute("kw", kw);
 		return ARTICLE_LIST_VIEW;
@@ -56,7 +56,7 @@ public class ArticleController {
 		Principal principal) {
 
 		Member member = this.memberService.getUser(principal.getName());
-		Page<Article> paging = this.articleService.getList(page, member.getUsername());
+		Page<Article> paging = this.articleService.getList(page, member.getUsername(), false);
 		model.addAttribute("paging", paging);
 		model.addAttribute("myList", true);
 		return ARTICLE_LIST_VIEW;
