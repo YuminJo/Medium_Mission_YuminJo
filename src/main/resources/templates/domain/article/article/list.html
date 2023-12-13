@@ -52,7 +52,7 @@
                             <span th:utext="${#strings.length(article.getTitle()) &lt;= 30} ? ${article.getTitle()} : ${#strings.substring(article.getTitle(), 0, 30)} + '...'"></span>
                         </button>
                     </form>
-                    <form th:if="${listusername != null}" th:href="@{|/b/${article.getAuthor().getUsername()}/${article.id}|}" method="post">
+                    <form th:if="${listusername != null}" th:action="@{|/b/${article.id}/increaseHit|}" method="post">
                         <button type="submit" class="align-middle text-left font-medium">
                             <span th:utext="${#strings.length(article.getTitle()) &lt;= 30} ? ${article.getTitle()} : ${#strings.substring(article.getTitle(), 0, 30)} + '...'"></span>
                         </button>

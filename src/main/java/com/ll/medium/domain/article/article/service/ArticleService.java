@@ -79,7 +79,7 @@ public class ArticleService {
 
 		Page<Article> resultPage = articleRepository.findAll(spec, pageable);
 
-		if (page > resultPage.getTotalPages()-1) {
+		if (page > resultPage.getTotalPages()-1 && resultPage.getTotalPages() != 0) {
 			throw new IllegalArgumentException("Requested page number exceeds available pages.");
 		}
 

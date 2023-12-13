@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
@@ -51,7 +52,7 @@ public class ArticleUserController {
 
 		Article article = this.articleService.getArticle(id).getData();
 
-		if (article == null || !article.getAuthor().getUsername().equals(userid)) {
+		if (!article.getAuthor().getUsername().equals(userid)) {
 			return rq.historyBack(UserErrorMessage.NO_ARTICLE);
 		}
 
@@ -61,5 +62,17 @@ public class ArticleUserController {
 
 		model.addAttribute("article", article);
 		return "domain/article/article/detail";
+	}
+
+	@PostMapping("/{id}/increaseHit")
+	public String increaseHit(@PathVariable("id") Integer id, Principal principal) {
+		Article article = this.articleService.getArticle(id).getData();
+
+		if (!articleService.articleIsNotPublished(article, principal)) {
+			return rq.historyBack(UserErrorMessage.PRIVATE_ARTICLE);
+		}
+
+		this.articleService.increaseHit(article);
+		return String.format("redirect:/b/%s/%s", article.getAuthor().getUsername(),id);
 	}
 }
