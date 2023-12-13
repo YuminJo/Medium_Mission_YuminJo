@@ -38,15 +38,22 @@ public class ArticleController {
 	private static final String ARTICLE_DETAIL_VIEW = "domain/article/article/detail";
 	private static final String FORM_VIEW = "domain/article/article/form";
 	private static final String REDIRECT_POST_LIST = "redirect:/post/list";
+	private static final String CUSTOM_PATH_ALL_POSTS = "/post/list";
+	private static final String CUSTOM_PATH_MY_POSTS = "/post/myList";
+
+	private Page<Article> getArticleList(Model model, int page, String kw, boolean isAllPosts) {
+		Page<Article> paging = articleService.getList(page, kw, isAllPosts);
+		model.addAttribute("paging", paging);
+		model.addAttribute("kw", kw);
+		return paging;
+	}
 
 	@GetMapping("/list")
 	public String showAllPost(Model model,
 		@RequestParam(value = "page", required = false, defaultValue = "0") int page,
 		@RequestParam(value = "kw", required = false, defaultValue = "") String kw) {
-		Page<Article> paging = articleService.getList(page, kw, true);
-		model.addAttribute("paging", paging);
-		model.addAttribute("kw", kw);
-		model.addAttribute("customPath","/post/list");
+		getArticleList(model, page, kw, true);
+		model.addAttribute("customPath", CUSTOM_PATH_ALL_POSTS);
 		return ARTICLE_LIST_VIEW;
 	}
 
@@ -57,11 +64,9 @@ public class ArticleController {
 		@RequestParam(value = "kw", required = false, defaultValue = "") String kw,
 		Principal principal) {
 		Member member = memberService.getUser(principal.getName());
-		Page<Article> paging = articleService.getList(page, member.getUsername(), false);
-		model.addAttribute("paging", paging);
-		model.addAttribute("kw", kw);
+		getArticleList(model, page, member.getUsername(), false);
 		model.addAttribute("listusername", member.getUsername());
-		model.addAttribute("customPath","/post/myList");
+		model.addAttribute("customPath", CUSTOM_PATH_MY_POSTS);
 		return ARTICLE_LIST_VIEW;
 	}
 	@GetMapping("/{id}")
@@ -84,7 +89,6 @@ public class ArticleController {
 	@GetMapping("/write")
 	public String write(Model model, ArticleForm articleForm) {
 		articleForm.setIsPublished(true);
-
 		model.addAttribute("articleForm", articleForm);
 		return FORM_VIEW;
 	}
@@ -96,16 +100,14 @@ public class ArticleController {
 			return FORM_VIEW;
 		}
 
-		Member member = this.memberService.getUser(principal.getName());
-		this.articleService.create(articleForm.getSubject(), articleForm.getContent(), articleForm.getIsPublished(),
-			member);
-		return "redirect:/post/list";
+		Member member = memberService.getUser(principal.getName());
+		articleService.create(articleForm.getSubject(), articleForm.getContent(), articleForm.getIsPublished(), member);
+		return REDIRECT_POST_LIST;
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/{id}/modify")
-	public String articleModify(Model model, ArticleForm articleForm, @PathVariable("id") Integer id,
-		Principal principal) {
+	public String articleModify(Model model, ArticleForm articleForm, @PathVariable("id") Integer id, Principal principal) {
 		Article article = this.articleService.getArticle(id);
 
 		if (!article.getAuthor().getUsername().equals(principal.getName())) {
@@ -129,9 +131,7 @@ public class ArticleController {
 			return rq.redirect(String.format("/post/%s", id), UserErrorMessage.USER_NO_MODIFY_PERMISSION);
 		}
 
-		this.articleService.modify(article, articleForm.getSubject(), articleForm.getContent(),
-			articleForm.getIsPublished());
-
+		articleService.modify(article, articleForm.getSubject(), articleForm.getContent(), articleForm.getIsPublished());
 		return rq.redirect(String.format("/post/%s", id), "게시글 수정 완료!");
 	}
 
@@ -144,5 +144,17 @@ public class ArticleController {
 		}
 		this.articleService.delete(article);
 		return rq.redirect("/post/list", "게시글이 삭제되었습니다.");
+	}
+
+	@PostMapping("/{id}/increaseHit")
+	public String increaseHit(@PathVariable("id") Integer id) {
+		Article article = this.articleService.getArticle(id);
+
+		if (article == null) {
+			return rq.historyBack(UserErrorMessage.NO_ARTICLE);
+		}
+
+		this.articleService.increaseHit(article);
+		return String.format("redirect:/post/%s", id);
 	}
 }

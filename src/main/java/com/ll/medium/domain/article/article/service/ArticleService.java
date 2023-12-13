@@ -121,4 +121,9 @@ public class ArticleService {
 	public void delete(Article article) {
 		articleRepository.delete(article);
 	}
+
+	public void increaseHit(Article article) {
+		article.setViewCount(article.getViewCount() + 1);
+		articleRepository.save(article);
+	}
 }
