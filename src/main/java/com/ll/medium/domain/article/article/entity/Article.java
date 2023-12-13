@@ -47,5 +47,6 @@ public class Article {
 
 	private LocalDateTime createDate;
 
+	@Builder.Default
 	private Long viewCount = 0L;
 }

@@ -47,12 +47,16 @@
                 class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                 <td class="p-4 text-center" th:text="${article.getId()}"></td>
                 <td class="p-4">
-                    <a th:if="${listusername == null}" th:href="@{|/post/${article.id}|}" class="align-middle text-left font-medium">
-                        <span th:utext="${#strings.length(article.getTitle()) &lt;= 30} ? ${article.getTitle()} : ${#strings.substring(article.getTitle(), 0, 30)} + '...'"></span>
-                    </a>
-                    <a th:if="${listusername != null}" th:href="@{|/b/${article.getAuthor().getUsername()}/${article.id}|}" class="align-middle text-left font-medium">
-                        <span th:utext="${#strings.length(article.getTitle()) &lt;= 30} ? ${article.getTitle()} : ${#strings.substring(article.getTitle(), 0, 30)} + '...'"></span>
-                    </a>
+                    <form th:if="${listusername == null}" th:action="@{|/post/${article.id}/increaseHit|}" method="post">
+                        <button type="submit" class="align-middle text-left font-medium">
+                            <span th:utext="${#strings.length(article.getTitle()) &lt;= 30} ? ${article.getTitle()} : ${#strings.substring(article.getTitle(), 0, 30)} + '...'"></span>
+                        </button>
+                    </form>
+                    <form th:if="${listusername != null}" th:href="@{|/b/${article.getAuthor().getUsername()}/${article.id}|}" method="post">
+                        <button type="submit" class="align-middle text-left font-medium">
+                            <span th:utext="${#strings.length(article.getTitle()) &lt;= 30} ? ${article.getTitle()} : ${#strings.substring(article.getTitle(), 0, 30)} + '...'"></span>
+                        </button>
+                    </form>
                 </td>
                 <td class="p-4">
                     <a class="align-middle text-left font-medium">
@@ -61,7 +65,7 @@
                 </td>
                 <td class="p-4" th:text="${#temporals.format(article.createDate, 'yy.MM.dd HH:mm')}">
                 </td>
-                <td class="p-4 text-center" th:text="0"></td>
+                <td class="p-4 text-center" th:text="${article.getViewCount()}"></td>
                 <td class="p-4 text-center" th:text="0"></td>
             </tr>
             </tbody>

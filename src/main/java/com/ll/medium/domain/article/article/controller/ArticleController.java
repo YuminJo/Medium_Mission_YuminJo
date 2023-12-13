@@ -3,7 +3,6 @@ package com.ll.medium.domain.article.article.controller;
 import java.security.Principal;
 
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.ll.medium.domain.article.article.entity.Article;
 import com.ll.medium.domain.article.article.service.ArticleService;
@@ -22,6 +20,7 @@ import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.service.MemberService;
 import com.ll.medium.global.errors.UserErrorMessage;
 import com.ll.medium.global.rq.Rq;
+import com.ll.medium.global.rsData.RsData.RsData;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -69,13 +68,10 @@ public class ArticleController {
 		model.addAttribute("customPath", CUSTOM_PATH_MY_POSTS);
 		return ARTICLE_LIST_VIEW;
 	}
+
 	@GetMapping("/{id}")
 	public String detail(Model model, @PathVariable("id") Integer id, ArticleForm articleForm, Principal principal) {
-		Article article = articleService.getArticle(id);
-
-		if (article == null) {
-			return rq.historyBack(UserErrorMessage.NO_ARTICLE);
-		}
+		Article article = articleService.getArticle(id).getData();
 
 		if (!articleService.articleIsNotPublished(article, principal)) {
 			return rq.historyBack(UserErrorMessage.PRIVATE_ARTICLE);
@@ -108,7 +104,7 @@ public class ArticleController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/{id}/modify")
 	public String articleModify(Model model, ArticleForm articleForm, @PathVariable("id") Integer id, Principal principal) {
-		Article article = this.articleService.getArticle(id);
+		Article article = this.articleService.getArticle(id).getData();
 
 		if (!article.getAuthor().getUsername().equals(principal.getName())) {
 			return rq.redirect(String.format("/post/%s", id), UserErrorMessage.USER_NO_MODIFY_PERMISSION);
@@ -125,7 +121,7 @@ public class ArticleController {
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/{id}/modify")
 	public String articleModify(@Valid ArticleForm articleForm, @PathVariable("id") Integer id, Principal principal) {
-		Article article = this.articleService.getArticle(id);
+		Article article = this.articleService.getArticle(id).getData();
 
 		if (!article.getAuthor().getUsername().equals(principal.getName())) {
 			return rq.redirect(String.format("/post/%s", id), UserErrorMessage.USER_NO_MODIFY_PERMISSION);
@@ -138,7 +134,7 @@ public class ArticleController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/{id}/delete")
 	public String answerDelete(Principal principal, @PathVariable("id") Integer id) {
-		Article article = this.articleService.getArticle(id);
+		Article article = this.articleService.getArticle(id).getData();
 		if (!article.getAuthor().getUsername().equals(principal.getName())) {
 			return rq.redirect(String.format("/post/%s", id), UserErrorMessage.USER_NO_DELETE_PERMISSION);
 		}
@@ -147,11 +143,11 @@ public class ArticleController {
 	}
 
 	@PostMapping("/{id}/increaseHit")
-	public String increaseHit(@PathVariable("id") Integer id) {
-		Article article = this.articleService.getArticle(id);
+	public String increaseHit(@PathVariable("id") Integer id, Principal principal) {
+		Article article = this.articleService.getArticle(id).getData();
 
-		if (article == null) {
-			return rq.historyBack(UserErrorMessage.NO_ARTICLE);
+		if (!articleService.articleIsNotPublished(article, principal)) {
+			return rq.historyBack(UserErrorMessage.PRIVATE_ARTICLE);
 		}
 
 		this.articleService.increaseHit(article);

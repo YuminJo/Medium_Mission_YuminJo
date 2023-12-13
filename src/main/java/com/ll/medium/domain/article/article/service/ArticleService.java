@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.ll.medium.domain.article.article.entity.Article;
 import com.ll.medium.domain.article.article.repository.ArticleRepository;
 import com.ll.medium.domain.member.member.entity.Member;
+import com.ll.medium.global.errors.UserErrorMessage;
 import com.ll.medium.global.rsData.RsData.RsData;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -95,8 +96,13 @@ public class ArticleService {
 			.toList();
 	}
 
-	public Article getArticle(Integer id) {
-		return articleRepository.findById(id).orElse(null);
+	public RsData<Article> getArticle(Integer id) {
+		Optional<Article> article = articleRepository.findById(id);
+
+		if(article.isEmpty()) {
+			throw new IllegalArgumentException(UserErrorMessage.NO_ARTICLE);
+		}
+		return RsData.of("200", "게시글 조회 완료.", article.get());
 	}
 
 	public boolean articleIsNotPublished(Article article, Principal principal) {
@@ -123,7 +129,7 @@ public class ArticleService {
 	}
 
 	public void increaseHit(Article article) {
-		article.setViewCount(article.getViewCount() + 1);
+		article.setViewCount(article.getViewCount() + 1L);
 		articleRepository.save(article);
 	}
 }

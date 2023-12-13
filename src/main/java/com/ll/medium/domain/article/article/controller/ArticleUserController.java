@@ -49,7 +49,7 @@ public class ArticleUserController {
 		@PathVariable("userid") String userid,
 		@PathVariable("id") Integer id) {
 
-		Article article = this.articleService.getArticle(id);
+		Article article = this.articleService.getArticle(id).getData();
 
 		if (article == null || !article.getAuthor().getUsername().equals(userid)) {
 			return rq.historyBack(UserErrorMessage.NO_ARTICLE);
