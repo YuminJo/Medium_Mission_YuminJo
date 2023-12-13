@@ -46,7 +46,7 @@
             <tr th:each="article, loop : ${paging}" th:if="${article.isPublished() || listusername != null}"
                 class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                 <td class="p-4 text-center" th:text="${article.getId()}"></td>
-                <td class="p-4">
+                <td class="p-4" style="width: 300px">
                     <form th:if="${listusername == null}" th:action="@{|/post/${article.id}/increaseHit|}" method="post">
                         <button type="submit" class="align-middle text-left font-medium">
                             <span th:utext="${#strings.length(article.getTitle()) &lt;= 30} ? ${article.getTitle()} : ${#strings.substring(article.getTitle(), 0, 30)} + '...'"></span>
