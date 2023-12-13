@@ -3,8 +3,6 @@ package com.ll.medium.domain.article.article.controller;
 import java.security.Principal;
 
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.ll.medium.domain.article.article.entity.Article;
 import com.ll.medium.domain.article.article.service.ArticleService;
@@ -26,11 +23,11 @@ import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequestMapping("/b")
-@RequiredArgsConstructor
-public class ArticleUserController {
-	private final ArticleService articleService;
-	private final MemberService memberService;
-	private final Rq rq;
+public class ArticleUserController extends ArticleBaseController {
+
+	public ArticleUserController(ArticleService articleService, MemberService memberService, Rq rq) {
+		super(articleService, memberService, rq);
+	}
 
 	@GetMapping("/{userid}")
 	public String showUserPost(Model model,@PathVariable("userid") String userid,
@@ -66,13 +63,6 @@ public class ArticleUserController {
 
 	@PostMapping("/{id}/increaseHit")
 	public String increaseHit(@PathVariable("id") Integer id, Principal principal) {
-		Article article = this.articleService.getArticle(id).getData();
-
-		if (!articleService.articleIsNotPublished(article, principal)) {
-			return rq.historyBack(UserErrorMessage.PRIVATE_ARTICLE);
-		}
-
-		this.articleService.increaseHit(article);
-		return String.format("redirect:/b/%s/%s", article.getAuthor().getUsername(),id);
+		return increaseHitAndRedirect(id, "/b/{userid}/{id}", principal);
 	}
 }

@@ -20,25 +20,21 @@ import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.service.MemberService;
 import com.ll.medium.global.errors.UserErrorMessage;
 import com.ll.medium.global.rq.Rq;
-import com.ll.medium.global.rsData.RsData.RsData;
-
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequestMapping("/post")
-@RequiredArgsConstructor
-public class ArticleController {
-	private final ArticleService articleService;
-	private final MemberService memberService;
-	private final Rq rq;
-
+public class ArticleController extends ArticleBaseController {
 	private static final String ARTICLE_LIST_VIEW = "domain/article/article/list";
 	private static final String ARTICLE_DETAIL_VIEW = "domain/article/article/detail";
 	private static final String FORM_VIEW = "domain/article/article/form";
 	private static final String REDIRECT_POST_LIST = "redirect:/post/list";
 	private static final String CUSTOM_PATH_ALL_POSTS = "/post/list";
 	private static final String CUSTOM_PATH_MY_POSTS = "/post/myList";
+
+	public ArticleController(ArticleService articleService, MemberService memberService, Rq rq) {
+		super(articleService, memberService, rq);
+	}
 
 	private Page<Article> getArticleList(Model model, int page, String kw, boolean isAllPosts) {
 		Page<Article> paging = articleService.getList(page, kw, isAllPosts);
@@ -144,13 +140,6 @@ public class ArticleController {
 
 	@PostMapping("/{id}/increaseHit")
 	public String increaseHit(@PathVariable("id") Integer id, Principal principal) {
-		Article article = this.articleService.getArticle(id).getData();
-
-		if (!articleService.articleIsNotPublished(article, principal)) {
-			return rq.historyBack(UserErrorMessage.PRIVATE_ARTICLE);
-		}
-
-		this.articleService.increaseHit(article);
-		return String.format("redirect:/post/%s", id);
+		return increaseHitAndRedirect(id, "/post/{id}", principal);
 	}
 }
