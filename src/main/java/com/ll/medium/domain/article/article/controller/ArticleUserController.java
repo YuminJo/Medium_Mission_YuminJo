@@ -2,7 +2,6 @@ package com.ll.medium.domain.article.article.controller;
 
 import java.security.Principal;
 
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,10 +15,7 @@ import com.ll.medium.domain.article.article.service.ArticleService;
 import com.ll.medium.domain.article.form.ArticleForm;
 import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.service.MemberService;
-import com.ll.medium.global.errors.UserErrorMessage;
 import com.ll.medium.global.rq.Rq;
-
-import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequestMapping("/b")
@@ -40,19 +36,7 @@ public class ArticleUserController extends ArticleBaseController {
 	public String showUserPostDetail(Model model, Principal principal, ArticleForm articleForm,
 		@PathVariable("userid") String userid,
 		@PathVariable("id") Integer id) {
-
-		Article article = this.articleService.getArticle(id).getData();
-
-		if (!article.getAuthor().getUsername().equals(userid)) {
-			return rq.historyBack(UserErrorMessage.NO_ARTICLE);
-		}
-
-		if (!articleService.articleIsNotPublished(article, principal)) {
-			return rq.historyBack(UserErrorMessage.PRIVATE_ARTICLE);
-		}
-
-		model.addAttribute("article", article);
-		return "domain/article/article/detail";
+		return showUserPostDetail(model, id, userid, principal);
 	}
 
 	@PostMapping("/{id}/increaseHit")

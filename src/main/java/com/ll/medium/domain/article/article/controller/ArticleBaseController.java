@@ -8,7 +8,6 @@ import org.springframework.ui.Model;
 
 import com.ll.medium.domain.article.article.entity.Article;
 import com.ll.medium.domain.article.article.service.ArticleService;
-import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.service.MemberService;
 import com.ll.medium.global.errors.UserErrorMessage;
 import com.ll.medium.global.rq.Rq;
@@ -38,5 +37,20 @@ public abstract class ArticleBaseController {
 		model.addAttribute("listusername", username);
 		model.addAttribute("customPath", customPath);
 		return "domain/article/article/list";
+	}
+
+	protected String showUserPostDetail(Model model, int id, String username, Principal principal) {
+		Article article = articleService.getArticle(id).getData();
+
+		if (username != null && !article.getAuthor().getUsername().equals(username)) {
+			return rq.historyBack(UserErrorMessage.NO_ARTICLE);
+		}
+
+		if (!articleService.articleIsNotPublished(article, principal)) {
+			return rq.historyBack(UserErrorMessage.PRIVATE_ARTICLE);
+		}
+
+		model.addAttribute("article", article);
+		return "domain/article/article/detail";
 	}
 }

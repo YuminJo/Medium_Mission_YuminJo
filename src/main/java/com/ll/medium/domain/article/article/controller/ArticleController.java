@@ -20,18 +20,12 @@ import com.ll.medium.domain.member.member.entity.Member;
 import com.ll.medium.domain.member.member.service.MemberService;
 import com.ll.medium.global.errors.UserErrorMessage;
 import com.ll.medium.global.rq.Rq;
+
 import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/post")
 public class ArticleController extends ArticleBaseController {
-	private static final String ARTICLE_LIST_VIEW = "domain/article/article/list";
-	private static final String ARTICLE_DETAIL_VIEW = "domain/article/article/detail";
-	private static final String FORM_VIEW = "domain/article/article/form";
-	private static final String REDIRECT_POST_LIST = "redirect:/post/list";
-	private static final String CUSTOM_PATH_ALL_POSTS = "/post/list";
-	private static final String CUSTOM_PATH_MY_POSTS = "/post/myList";
-
 	public ArticleController(ArticleService articleService, MemberService memberService, Rq rq) {
 		super(articleService, memberService, rq);
 	}
@@ -47,7 +41,7 @@ public class ArticleController extends ArticleBaseController {
 	public String showAllPost(Model model,
 		@RequestParam(value = "page", required = false, defaultValue = "0") int page,
 		@RequestParam(value = "kw", required = false, defaultValue = "") String kw) {
-		return showUserList(model, page, null, "", CUSTOM_PATH_ALL_POSTS, true);
+		return showUserList(model, page, null, "", "/post/list", true);
 	}
 
 	@PreAuthorize("isAuthenticated()")
@@ -57,19 +51,12 @@ public class ArticleController extends ArticleBaseController {
 		@RequestParam(value = "kw", required = false, defaultValue = "") String kw,
 		Principal principal) {
 		Member member = memberService.getUser(principal.getName());
-		return showUserList(model, page, member.getUsername(), member.getUsername(), CUSTOM_PATH_MY_POSTS, false);
+		return showUserList(model, page, member.getUsername(), member.getUsername(), "/post/myList", false);
 	}
 
 	@GetMapping("/{id}")
 	public String detail(Model model, @PathVariable("id") Integer id, ArticleForm articleForm, Principal principal) {
-		Article article = articleService.getArticle(id).getData();
-
-		if (!articleService.articleIsNotPublished(article, principal)) {
-			return rq.historyBack(UserErrorMessage.PRIVATE_ARTICLE);
-		}
-
-		model.addAttribute("article", article);
-		return ARTICLE_DETAIL_VIEW;
+		return showUserPostDetail(model, id, null, principal);
 	}
 
 	@PreAuthorize("isAuthenticated()")
@@ -77,24 +64,25 @@ public class ArticleController extends ArticleBaseController {
 	public String write(Model model, ArticleForm articleForm) {
 		articleForm.setIsPublished(true);
 		model.addAttribute("articleForm", articleForm);
-		return FORM_VIEW;
+		return "domain/article/article/form";
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/write")
 	public String write(@Valid ArticleForm articleForm, BindingResult bindingResult, Principal principal) {
 		if (bindingResult.hasErrors()) {
-			return FORM_VIEW;
+			return "domain/article/article/form";
 		}
 
 		Member member = memberService.getUser(principal.getName());
 		articleService.create(articleForm.getSubject(), articleForm.getContent(), articleForm.getIsPublished(), member);
-		return REDIRECT_POST_LIST;
+		return "redirect:/post/list";
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/{id}/modify")
-	public String articleModify(Model model, ArticleForm articleForm, @PathVariable("id") Integer id, Principal principal) {
+	public String articleModify(Model model, ArticleForm articleForm, @PathVariable("id") Integer id,
+		Principal principal) {
 		Article article = this.articleService.getArticle(id).getData();
 
 		if (!article.getAuthor().getUsername().equals(principal.getName())) {
@@ -106,7 +94,7 @@ public class ArticleController extends ArticleBaseController {
 		articleForm.setIsPublished(article.isPublished());
 
 		model.addAttribute("articleForm", articleForm);
-		return FORM_VIEW;
+		return "domain/article/article/form";
 	}
 
 	@PreAuthorize("isAuthenticated()")
@@ -118,7 +106,8 @@ public class ArticleController extends ArticleBaseController {
 			return rq.redirect(String.format("/post/%s", id), UserErrorMessage.USER_NO_MODIFY_PERMISSION);
 		}
 
-		articleService.modify(article, articleForm.getSubject(), articleForm.getContent(), articleForm.getIsPublished());
+		articleService.modify(article, articleForm.getSubject(), articleForm.getContent(),
+			articleForm.getIsPublished());
 		return rq.redirect(String.format("/post/%s", id), "게시글 수정 완료!");
 	}
 

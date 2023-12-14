@@ -2,9 +2,9 @@
 <div layout:fragment="content">
     <div class="flex justify-center p-6" th:object="${article}">
         <article class="text-dark-200 az ay al ax py-3">
-            <h1 th:text="${article.getTitle()}"
-                class="text-4xl font-extrabold tracking-tight lg:text-5xl lg:leading-[3.5rem]">
-            </h1>
+            <span th:text="${article.getTitle()}"
+                class="az text-4xl font-extrabold tracking-tight lg:text-5xl lg:leading-[3.5rem]">
+            </span>
 
             <div class="mt-3 text-gray-400">
                 <i class="fa-regular fa-user" style="width: 16px"></i>
@@ -21,8 +21,8 @@
 
             <hr>
 
-            <p class="az ay al py-3" th:text="${article.getBody()}">
-            </p>
+            <span class="az ay al py-3" th:text="${article.getBody()}">
+            </span>
         </article>
     </div>
 </div>

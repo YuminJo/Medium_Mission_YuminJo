@@ -38,7 +38,7 @@
             <div class="space-y-2">
                 <div class="flex items-center justify-between">
                     <form th:action="@{|/post/${article.id}/increaseHit|}" method="post">
-                        <button type="submit" class="text-lg font-bold leading-tight">
+                        <button type="submit" class="text-lg font-bold leading-tight text-left">
                             <span th:utext="${#strings.length(article.getTitle()) &lt;= 60} ? ${article.getTitle()} : ${#strings.substring(article.getTitle(), 0, 60)} + '...'"></span>
                         </button>
                     </form>
@@ -48,7 +48,7 @@
                     </div>
                 </div>
                 <form th:action="@{|/post/${article.id}/increaseHit|}" method="post">
-                    <button type="submit" class="text-sm">
+                    <button type="submit" class="text-sm text-left">
                         <span th:utext="${#strings.length(article.getBody()) &lt;= 60} ? ${article.getBody()} : ${#strings.substring(article.getBody(), 0, 60)} + '...'"></span>
                     </button>
                 </form>
