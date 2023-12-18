@@ -1,0 +1,129 @@
+<html lang="ko" layout:decorate="~{global/layout}">
+<div layout:fragment="content" class="container mx-auto">
+
+    <!-- 게시판 상위 제목 -->
+    <div class="flex justify-center" th:if="${listusername == null}">
+        <div class="az ay al py-3 px-4">
+            <h1 class="font-bold text-2xl">메인 게시판</h1>
+            <h1 class="font-medium mb-4">이곳은 메인 게시판 입니다!</h1>
+        </div>
+    </div>
+
+    <div class="flex justify-center" th:if="${listusername != null}">
+        <div class="az ay al py-3 px-4">
+            <h1 class="font-bold text-2xl" th:text="${listusername} + ' 게시물'"></h1>
+            <h1 class="font-medium mb-4" th:text="${listusername} + '님의 게시물 입니다.'"></h1>
+        </div>
+    </div>
+
+
+    <!-- 테이블 내용 -->
+    <div class="flex justify-center">
+        <table class="w-full table-auto az ay al py-3">
+            <thead class="border-b">
+            <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted text-left">
+                <th class="h-12 px-4 align-middle font-medium text-muted-foreground w-1/10 text-center">
+                    번호
+                </th>
+                <th class="h-12 px-4 align-middle font-medium text-muted-foreground w-3/10">
+                    제목
+                </th>
+                <th class="h-12 px-4 align-middle font-medium text-muted-foreground w-2/10">
+                    작성자
+                </th>
+                <th class="h-12 px-4 align-middle font-medium text-muted-foreground w-2/10">
+                    작성일
+                </th>
+                <th class="h-12 px-4 align-middle font-medium text-muted-foreground w-1/10 text-center">
+                    조회수
+                </th>
+                <th class="h-12 px-4 align-middle font-medium text-muted-foreground w-1/10 text-center">
+                    추천
+                </th>
+            </tr>
+            </thead>
+            <tbody th:if="${paging.stream().count() > 0}">
+            <tr th:each="article, loop : ${paging}" th:if="${article.isPublished() || listusername != null}"
+                class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                <td class="p-4 text-center" th:text="${article.getId()}"></td>
+                <td class="p-4" style="width: 300px">
+                    <form th:if="${listusername == null}" th:action="@{|/post/${article.id}/increaseHit|}" method="post">
+                        <button type="submit" class="align-middle text-left font-medium">
+                            <span th:utext="${#strings.length(article.getTitle()) &lt;= 30} ? ${article.getTitle()} : ${#strings.substring(article.getTitle(), 0, 30)} + '...'"></span>
+                        </button>
+                    </form>
+                    <form th:if="${listusername != null}" th:action="@{|/b/${article.id}/increaseHit|}" method="post">
+                        <button type="submit" class="align-middle text-left font-medium">
+                            <span th:utext="${#strings.length(article.getTitle()) &lt;= 30} ? ${article.getTitle()} : ${#strings.substring(article.getTitle(), 0, 30)} + '...'"></span>
+                        </button>
+                    </form>
+                </td>
+                <td class="p-4">
+                    <a class="align-middle text-left font-medium">
+                        <span th:utext="${#strings.length(article.author.username) &lt;= 10} ? ${article.author.username} : ${#strings.substring(article.author.username, 0, 10)} + '...'"></span>
+                    </a>
+                </td>
+                <td class="p-4" th:text="${#temporals.format(article.createDate, 'yy.MM.dd HH:mm')}">
+                </td>
+                <td class="p-4 text-center" th:text="${article.getViewCount()}"></td>
+                <td class="p-4 text-center" th:text="0"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 아무 글도 없음! -->
+    <div class="flex justify-center" th:if="${paging.stream().count() <= 0}  ">
+        <div class="az ay al ax py-3 text-center">
+            <p class="text-black font-bold text-4xl p-2">어라..? &#x1FAE0</p>
+            <p>아직 아무 글도 없어요..!</p>
+            <p>새로운 글을 기다리고 있어요..!</p>
+        </div>
+    </div>
+    <!--페이징 처리-->
+    <div class="flex justify-center" th:if="${!paging.isEmpty()}">
+        <div class="az ay py-3 text-center">
+            <ul class="pagination flex list-none items-center">
+                <li th:if="${paging.hasPrevious()}" class="page-item">
+                    <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number -1}">
+                        <i class="fa-solid fa-caret-left m-5"></i>
+                    </a>
+                </li>
+                <li th:each="page: ${#numbers.sequence(paging.number - (paging.number % 10), (paging.number - (paging.number % 10)) + 9)}"
+                    th:if="${page >= 0 and page < paging.totalPages}"
+                    th:classappend="${page == paging.number} ? 'active font-bold'" class="page-item m-3">
+                    <a th:text="${page + 1}" class="page-link" href="javascript:void(0)" th:data-page="${page}"></a>
+                </li>
+                <li th:if="${paging.hasNext()}" class="page-item">
+                    <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number+1}">
+                        <i class="fa-solid fa-caret-right m-5"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <form th:action="@{${customPath}}" method="get" id="searchForm">
+        <input type="hidden" id="kw" name="kw" th:value="${kw}">
+        <input type="hidden" id="page" name="page" th:value="${paging.number}">
+    </form>
+    <!--페이징 처리 끝-->
+    <!-- 게시글 작성 버튼 -->
+    <div class="flex justify-center" th:if="${listusername == null}">
+        <div class="az ay al ax py-3 text-right">
+            <a th:href="@{/post/write}"
+               class="bg-black hover:bg-gray-800 text-white py-2 px-12 rounded-l-full rounded-r-full">
+                글쓰기
+            </a>
+        </div>
+    </div>
+</div>
+<script layout:fragment="script" type='text/javascript'>
+    const page_elements = document.getElementsByClassName("page-link");
+    Array.from(page_elements).forEach(function (element) {
+        element.addEventListener('click', function () {
+            document.getElementById('page').value = this.dataset.page;
+            document.getElementById('searchForm').submit();
+        });
+    });
+</script>
+</html>

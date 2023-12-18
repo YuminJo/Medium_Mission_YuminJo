@@ -1,0 +1,46 @@
+<html layout:decorate="~{global/layout}">
+<div layout:fragment="content">
+    <form class="flex justify-center p-6" th:object="${articleForm}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <article class="az ay al py-3 max-h-full flex flex-col space-y-2 not-prose">
+            <textarea id="subjectTextArea" th:field="*{subject}" onkeydown="resize(this)" onkeyup="resize(this)" oninput="resize(this)"
+                      th:class="${#fields.hasErrors('subject')} ? 'text-4xl font-extrabold tracking-tight lg:text-5xl border-none text-black placeholder-red-500 p-0 focus:outline-none focus:ring-0 focus:border-transparent'
+:'text-4xl font-extrabold tracking-tight lg:text-5xl border-none text-black placeholder-gray-200 p-0 focus:outline-none focus:ring-0 focus:border-transparent'"
+                      placeholder="제목을 입력하세요"></textarea>
+            <p class="text-gray-500 dark:text-gray-400">Posted on December 10, 2023</p>
+            <div class="border-t p-3"></div>
+            <textarea th:field="*{content}" onkeydown="resize(this)" onkeyup="resize(this)" onload="resize(this)"
+                      class="border-none text-black text-black placeholder-gray-200 p-0 focus:outline-none focus:ring-0 focus:border-transparent"
+                      placeholder="내용을 입력하세요"></textarea>
+        </article>
+
+        <!-- 하단 Navbar -->
+        <div class="bg-gray-100 fixed bottom-0 w-full">
+            <div class="max-w-screen-xl flex items-center justify-between mx-auto p-3">
+                <!-- 공개/비공개 체크박스 -->
+                <div class="flex items-center space-x-2">
+                    <label class="text-black">공개</label>
+                    <input th:field="*{isPublished}" type="checkbox" id="isPublished" name="isPublished"
+                           class="form-checkbox h-6 w-6 text-black border-gray-300 rounded-full"
+                           th:checked="${articleForm.isPublished}">
+                </div>
+
+                <!-- 완료 버튼 또는 다른 내용 추가 가능 -->
+                <input type="submit" class="bg-black hover:bg-gray-800 text-white py-2 px-10 rounded-full" value="완료">
+            </div>
+        </div>
+    </form>
+
+    <script>
+        // 페이지 로드 시 textarea 크기 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            resize(document.getElementById('subjectTextArea'));
+            resize(document.querySelector('textarea[name="content"]'));
+        });
+        function resize(obj) {
+            obj.style.height = '1px';
+            obj.style.height = (12 + obj.scrollHeight) + 'px';
+        }
+    </script>
+</div>
+</html>

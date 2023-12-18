@@ -1,1 +1,63 @@
-메인
+<html layout:decorate="~{global/layout}">
+<div layout:fragment="content">
+    <div class="bg-blue-800">
+        <div class="max-w-full border-t border-b border-black">
+            <div class="flex justify-center">
+                <div class="text-white text-left az ay al ax">
+                    <div class="py-10">
+                        <p class="text-5xl font-bold mb-4">안녕하세요.</p>
+                        <p class="text-2xl text-white font-bold mb-12">우와 반갑습니다.</p>
+                        <button class="px-6 py-2 bg-white text-blue-800 rounded-full">아무 기능이 없는 버튼.</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col text-center p-5">
+        <p class="text-3xl">앗!</p>
+        <p>당신을 위해 최근 글목록을 준비했어요!</p>
+    </div>
+
+    <!-- 아무 글도 없음! -->
+    <div class="flex justify-center" th:if="${recentArticle.stream().count() <= 0}">
+        <div class="az ay al ax py-3 text-center">
+            <p class="text-black font-bold text-4xl p-2">어라..? &#x1FAE0</p>
+            <p>아직 아무 글도 없어요..!</p>
+            <p>어라라.. 사이트에 이용자가 없나봐요...</p>
+        </div>
+    </div>
+
+    <!-- 글 있음 -->
+    <hr>
+    <div class="flex justify-center" th:if="${recentArticle.stream().count() > 0}" th:each="article, loop : ${recentArticle}">
+        <div class="bg-card az ay al ax py-3 border-b">
+            <!-- 작성자 정보 추가 -->
+            <p class="text-xs text-black-300 mb-3" th:text="${article.author.username}"></p>
+
+            <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <form th:action="@{|/post/${article.id}/increaseHit|}" method="post">
+                        <button type="submit" class="text-lg font-bold leading-tight text-left">
+                            <span th:utext="${#strings.length(article.getTitle()) &lt;= 60} ? ${article.getTitle()} : ${#strings.substring(article.getTitle(), 0, 60)} + '...'"></span>
+                        </button>
+                    </form>
+                    <!-- TAG -->
+                    <div class="inline-flex items-center px-2.5 py-0.5 text-s font-bold bg-blue-500 text-white rounded-full">
+                        SampleTag
+                    </div>
+                </div>
+                <form th:action="@{|/post/${article.id}/increaseHit|}" method="post">
+                    <button type="submit" class="text-sm text-left">
+                        <span th:utext="${#strings.length(article.getBody()) &lt;= 60} ? ${article.getBody()} : ${#strings.substring(article.getBody(), 0, 60)} + '...'"></span>
+                    </button>
+                </form>
+            </div>
+            <div class="mt-5">
+                <!-- 해당 게시물 보러가기 대신에 작성된 날짜를 보여주기 -->
+                <p class="text-gray-500" style="font-size: 13px;" th:text="${'Posted On ' + #temporals.format(article.createDate, 'MMMM d')}"></p>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

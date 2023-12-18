@@ -1,0 +1,53 @@
+<html layout:decorate="~{global/layout}">
+<div layout:fragment="content" class="flex items-center justify-center min-h-screen bg-white-100">
+    <div tabindex="-1"
+         class="bg-black/50 backdrop-filter backdrop-blur overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 h-full items-center justify-center flex">
+        <div class="relative bg-white rounded-lg shadow p-5 w-full max-w-md">
+            <span class="flex justify-end" th:onclick='|window.location.href="@{/}"|'>
+                <i class="fa-solid fa-xmark"></i>
+                <span class="sr-only">Close popup</span>
+            </span>
+            <h3 class="text-2xl mb-0.5 font-medium">우와 Flat한 로그인 창!</h3>
+            <p class="mb-4 text-sm font-normal text-gray-800">로그인을 하면 로그인이 될까요..?</p>
+            <div class="mt-7 flex flex-col gap-2">
+                <button class="inline-flex items-center justify-center rounded border border-slate-300 bg-white p-2 text-sm text-black outline-none">
+                    <i class="fa-brands fa-github fa-2x mr-2"></i>
+                    Continue with GitHub
+                </button>
+            </div>
+            <div class="flex w-full items-center gap-2 py-6 text-sm text-slate-600">
+                <div class="h-px w-full bg-slate-200"></div>
+                OR
+                <div class="h-px w-full bg-slate-200"></div>
+            </div>
+            <form th:action="@{/member/login}" method="post" class="w-full">
+                <div th:if="${param.error}">
+                    <span style="font-size: 13px; color: red">
+                        사용자ID 또는 비밀번호를 확인해 주세요.
+                    </span>
+                </div>
+                <div>
+                    <label for="username" class="sr-only">userid</label>
+                    <input name="username" id="username" type="text"
+                           class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-black focus:ring-offset-1"
+                           placeholder="userid">
+                    <label for="password" class="sr-only">Password</label>
+                    <input name="password" id="password" type="password"
+                           class="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-black focus:ring-offset-1"
+                           placeholder="password">
+                </div>
+                <p class="mb-3 mt-2 text-sm text-gray-500">
+                    <span class="text-blue-800 hover:text-blue-600">비밀번호를 잊었지만 지금은 찾을 수 없어요!</span>
+                </p>
+                <button type="submit"
+                        class="inline-flex w-full items-center justify-center rounded-lg bg-black p-2 py-3 text-sm font-medium text-white outline-none focus:ring-2 focus:ring-black focus:ring-offset-1 disabled:bg-gray-400">
+                    로그인하기!
+                </button>
+            </form>
+            <div class="mt-6 text-center text-sm text-slate-600">
+                계정이 없나요? <a href="/member/join" class="font-medium text-[#4285f4]">가입하기!</a>
+            </div>
+        </div>
+    </div>
+</div>
+</html>
